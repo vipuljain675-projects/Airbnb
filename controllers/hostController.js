@@ -1,25 +1,31 @@
 const Home = require("../models/home");
 
 exports.getAddHome = (req, res, next) => {
-  res.render("host/addHome", { 
-    pageTitle: "Add Home", 
-    currentPage: "addHome"
+  res.render("host/edit-home", {
+    pageTitle: "Add Home",
+    currentPage: "addHome",
+    editing: false, // Not editing, creating new
   });
 };
 
 exports.getEditHome = (req, res, next) => {
-  res.render("host/edit-home", { 
-    pageTitle: "Edit Home", 
-    currentPage: "host-homes"
-  });
-};
+  const homeId = req.params.homeId;
+  const editing = req.query.editing === "true";
 
-exports.getHostHomes = (req, res, next) => {
-  Home.fetchAll((registeredHomes) => {
-    res.render("host/host-home-list", { 
-      registeredHomes: registeredHomes, 
-      pageTitle: "Host Dashboard", 
-      currentPage: "host-homes" 
+  if (!editing) {
+    return res.redirect("/host/host-home-list");
+  }
+
+  Home.findById(homeId, (home) => {
+    if (!home) {
+      return res.redirect("/");
+    }
+    // Render the form but with data pre-filled
+    res.render("host/edit-home", {
+      pageTitle: "Edit Home",
+      currentPage: "host-homes",
+      editing: editing,
+      home: home,
     });
   });
 };
@@ -28,13 +34,26 @@ exports.postAddHome = (req, res, next) => {
   const { houseName, rating, price, location, photoUrl } = req.body;
   const home = new Home(houseName, price, location, rating, photoUrl);
   home.save();
-  res.render("host/home-added", { 
-    pageTitle: "Success", 
-    currentPage: "addHome" 
+  res.render("host/home-added", {
+    pageTitle: "Success",
+    currentPage: "addHome",
   });
 };
 
 exports.postDeleteHome = (req, res, next) => {
-  console.log("Delete Request for:", req.body);
-  res.redirect("/host/host-home-list");
+  const homeId = req.body.homeId;
+  Home.deleteById(homeId, () => {
+    // Reload the page after deletion
+    res.redirect("/host/host-home-list");
+  });
+};
+
+exports.getHostHomes = (req, res, next) => {
+  Home.fetchAll((registeredHomes) => {
+    res.render("host/host-home-list", {
+      registeredHomes: registeredHomes,
+      pageTitle: "Host Dashboard",
+      currentPage: "host-homes",
+    });
+  });
 };

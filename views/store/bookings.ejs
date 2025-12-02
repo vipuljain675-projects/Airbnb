@@ -3,10 +3,70 @@
 <%- include("../partials/head") %>
 <body>
   <%- include("../partials/nav") %>
-  <main class="centered-message">
-    <h1>No trips booked... yet!</h1>
-    <p>Time to dust off your bags and start planning your next adventure.</p>
-    <a href="/homes" class="btn btn-outline">Start searching</a>
+  
+  <main>
+    <h1 style="margin-bottom: 2rem;">My Trips</h1>
+
+    <% if (bookings.length === 0) { %>
+        <div class="centered-message">
+            <h1>No trips booked... yet!</h1>
+            <p>Time to dust off your bags and start planning your next adventure.</p>
+            <a href="/homes" class="btn btn-outline">Start searching</a>
+        </div>
+    <% } else { %>
+        
+        <div style="display: flex; flex-direction: column; gap: 1.5rem; max-width: 800px; margin: 0 auto;">
+            <% bookings.forEach(booking => { %>
+                
+                <div style="border: 1px solid #ddd; border-radius: 12px; overflow: hidden; display: flex; box-shadow: 0 4px 12px rgba(0,0,0,0.08);">
+                    
+                    <div style="padding: 1.5rem; flex: 1;">
+                        
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                            <div>
+                                <h2 style="margin: 0 0 0.5rem 0;"><%= booking.homeName %></h2>
+                                <p style="color: #717171; margin-bottom: 1rem; font-size: 0.9rem;">
+                                    Booking Status: <span style="color: green; font-weight: bold;">Confirmed</span>
+                                </p>
+                            </div>
+                            <div style="text-align: right;">
+                                <span style="background: #222; color: white; padding: 4px 8px; border-radius: 4px; font-size: 0.8rem;">
+                                    <%= booking.guests %> Guests
+                                </span>
+                            </div>
+                        </div>
+
+                        <div style="background: #f9f9f9; padding: 10px; border-radius: 8px; margin-bottom: 1rem; font-size: 0.9rem;">
+                            <p style="margin: 0 0 5px 0;"><strong>Guest:</strong> <%= booking.firstName %> <%= booking.lastName %></p>
+                            <p style="margin: 0;"><strong>Contact:</strong> <%= booking.phone %> • <%= booking.email %></p>
+                        </div>
+                        
+                        <div style="display: flex; gap: 2rem; margin-bottom: 1rem;">
+                            <div>
+                                <small style="font-weight: bold; color: #222; font-size: 0.7rem;">CHECK-IN</small>
+                                <div style="color: #717171;"><%= booking.startDate %></div>
+                            </div>
+                            <div>
+                                <small style="font-weight: bold; color: #222; font-size: 0.7rem;">CHECK-OUT</small>
+                                <div style="color: #717171;"><%= booking.endDate %></div>
+                            </div>
+                        </div>
+
+                        <div style="border-top: 1px solid #eee; padding-top: 1rem; margin-top: 1rem;">
+                            <span style="font-size: 1.2rem; font-weight: bold;">Total Bill: ₹<%= booking.totalPrice %></span>
+                        </div>
+                    </div>
+
+                    <div style="width: 60px; background: linear-gradient(180deg, #ff385c 0%, #bd1e59 100%); display: flex; align-items: center; justify-content: center;">
+                        <span style="writing-mode: vertical-rl; text-orientation: mixed; font-weight: bold; color: white; letter-spacing: 2px; font-size: 0.9rem;">AIRBNB TICKET</span>
+                    </div>
+
+                </div>
+
+            <% }) %>
+        </div>
+
+    <% } %>
   </main>
 </body>
 </html>

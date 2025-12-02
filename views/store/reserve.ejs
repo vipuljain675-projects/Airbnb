@@ -3,19 +3,65 @@
 <%- include("../partials/head") %>
 <body>
   <%- include("../partials/nav") %>
+  
   <main>
     <div class="form-container">
         <h1>Confirm your trip</h1>
-        <p style="color: #717171; margin-bottom: 2rem;">You are booking <strong><%= homeId %></strong></p>
-        <div class="form-control">
-            <label>Check-In</label>
-            <input type="date">
-        </div>
-        <div class="form-control">
-            <label>Check-Out</label>
-            <input type="date">
-        </div>
-        <button class="submit-btn">Reserve Now</button>
+        <p style="color: #717171; margin-bottom: 2rem;">You are booking <strong><%= home.houseName %></strong></p>
+        
+        <form action="/bookings" method="POST">
+            
+            <input type="hidden" name="homeId" value="<%= homeId %>">
+            <input type="hidden" name="homeName" value="<%= home.houseName %>">
+            <input type="hidden" name="pricePerNight" value="<%= home.price %>">
+
+            <div style="display: flex; gap: 1rem;">
+                <div class="form-control" style="flex: 1;">
+                    <label>First Name</label>
+                    <input type="text" name="firstName" placeholder="John" required>
+                </div>
+                <div class="form-control" style="flex: 1;">
+                    <label>Last Name</label>
+                    <input type="text" name="lastName" placeholder="Doe" required>
+                </div>
+            </div>
+
+            <div class="form-control">
+                <label>Email Address</label>
+                <input type="email" name="email" placeholder="john@example.com" required>
+            </div>
+
+            <div class="form-control">
+                <label>Phone Number</label>
+                <input type="tel" name="phone" placeholder="+91 98765 43210" required>
+            </div>
+            
+            <div class="form-control">
+                <label>Number of Guests</label>
+                <input type="number" name="guests" min="1" max="10" value="1" required>
+            </div>
+
+            <hr style="border: 0; border-top: 1px solid #eee; margin: 1.5rem 0;">
+
+            <div style="display: flex; gap: 1rem;">
+                <div class="form-control" style="flex: 1;">
+                    <label>Check-In</label>
+                    <input type="date" name="checkIn" required>
+                </div>
+                <div class="form-control" style="flex: 1;">
+                    <label>Check-Out</label>
+                    <input type="date" name="checkOut" required>
+                </div>
+            </div>
+
+            <div style="margin-bottom: 1rem; padding: 1rem; background: #f7f7f7; border-radius: 8px;">
+                <p><strong>Rate:</strong> ₹<%= home.price %> / night</p>
+                <p style="font-size: 0.9rem; color: #717171;">Total calculated at checkout</p>
+            </div>
+
+            <button class="submit-btn" type="submit">Reserve Now</button>
+            
+        </form>
     </div>
   </main>
 </body>

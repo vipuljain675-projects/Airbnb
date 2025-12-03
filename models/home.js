@@ -36,12 +36,10 @@ module.exports = class Home {
     });
   }
 
-  // ✅ NEW: Update existing home
   static updateById(homeId, updatedInfo, callback) {
     Home.fetchAll((homes) => {
       const homeIndex = homes.findIndex((h) => h.id === homeId);
       if (homeIndex > -1) {
-        // Create updated home object but KEEP the old ID
         const updatedHome = new Home(
           updatedInfo.houseName,
           updatedInfo.price,
@@ -49,14 +47,11 @@ module.exports = class Home {
           updatedInfo.rating,
           updatedInfo.photoUrl
         );
-        updatedHome.id = homeId; // Restore the ID
-
+        updatedHome.id = homeId;
         homes[homeIndex] = updatedHome;
         const homeDataPath = path.join(rootDir, "data", "homes.json");
         fs.writeFile(homeDataPath, JSON.stringify(homes), (error) => {
-          if (!error) {
-            callback();
-          }
+          if (!error) callback();
         });
       } else {
         callback();
@@ -69,10 +64,21 @@ module.exports = class Home {
       const updatedHomes = homes.filter((h) => h.id !== homeId);
       const homeDataPath = path.join(rootDir, "data", "homes.json");
       fs.writeFile(homeDataPath, JSON.stringify(updatedHomes), (error) => {
-        if (!error) {
-          callback();
-        }
+        if (!error) callback();
       });
+    });
+  }
+
+  // ✅ NEW: Search Logic
+  static search(query, callback) {
+    Home.fetchAll((homes) => {
+      const results = homes.filter(home => {
+          const lowerLocation = home.location.toLowerCase();
+          const lowerTitle = home.houseName.toLowerCase();
+          const lowerQuery = query.toLowerCase();
+          return lowerLocation.includes(lowerQuery) || lowerTitle.includes(lowerQuery);
+      });
+      callback(results);
     });
   }
 };

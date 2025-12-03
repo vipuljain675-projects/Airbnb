@@ -3,15 +3,30 @@
 <%- include("../partials/head") %>
 <body>
   <%- include("../partials/nav") %>
+  
   <main>
-    <% if (registeredHomes.length === 0) { %>
-      <div class="centered-message">
-        <h2>No homes available yet!</h2>
-        <p>Be the first to list your home.</p>
-        <a href="/host/add-home" class="btn edit-btn">List your home</a>
-      </div>
+    <% if (isSearch) { %>
+        <h1 style="margin-bottom: 1.5rem;">Search Results</h1>
     <% } else { %>
-      <h1 style="margin-bottom: 1rem;">Explore Homes</h1>
+        <h1 style="margin-bottom: 1.5rem;">Explore Homes</h1>
+    <% } %>
+
+    <% if (registeredHomes.length === 0) { %>
+      
+      <div class="centered-message">
+        <% if (isSearch) { %>
+            <h2>No matches found</h2>
+            <p>We couldn't find any homes matching your search.</p>
+            <a href="/homes" class="btn btn-outline">Clear Search</a>
+        <% } else { %>
+            <h2>No homes available yet!</h2>
+            <p>Be the first to list your home.</p>
+            <a href="/host/add-home" class="btn btn-primary">List your home</a>
+        <% } %>
+      </div>
+
+    <% } else { %>
+      
       <div class="home-grid">
         <% registeredHomes.forEach(home => { %>
           
@@ -28,35 +43,27 @@
               
               <p style="color: #717171; margin: 4px 0;"><%= home.houseName %></p>
               
-              <div style="margin-top: 6px; margin-bottom: 12px;">
+              <div style="margin-top: 6px;">
                   <span class="price">₹<%= home.price %></span> 
                   <span style="font-weight: 300;"> night</span>
               </div>
 
-              <div style="display: flex; gap: 10px; margin-top: auto;">
+              <div class="card-actions">
+                  <a href="/homes/<%= home.id %>" class="btn btn-outline" style="flex: 1; text-align: center;">Details</a>
                   
-                  <a href="/homes/<%= home.id %>" class="btn btn-outline" style="flex: 1; text-align: center; font-size: 0.8rem; padding: 0.5rem;">
-                      Details
-                  </a>
-
                   <form action="/favourites" method="POST" style="flex: 0;">
                       <input type="hidden" name="homeId" value="<%= home.id %>">
-                      <button class="btn btn-outline" style="padding: 0.5rem 0.8rem; font-size: 1.2rem; line-height: 1; color: #ff385c; border-color: #ff385c; cursor: pointer;">
-                          ♡
-                      </button>
+                      <button class="btn btn-outline" style="padding: 0.5rem 0.8rem; font-size: 1.2rem; line-height: 1; color: #ff385c; border-color: #ff385c;">♡</button>
                   </form>
 
-                  <a href="/reserve/<%= home.id %>" class="btn btn-primary" style="flex: 1; text-align: center; font-size: 0.8rem; padding: 0.5rem;">
-                      Book Now
-                  </a>
-
+                  <a href="/reserve/<%= home.id %>" class="btn btn-primary" style="flex: 1; text-align: center;">Book</a>
               </div>
-
             </div>
           </div>
 
         <% }) %>
       </div>
+
     <% } %>
   </main>
 </body>

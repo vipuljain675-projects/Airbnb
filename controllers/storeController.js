@@ -1,6 +1,6 @@
 const Home = require("../models/home");
 const Booking = require("../models/booking");
-const Favourite = require("../models/favourite"); // ✅ Import New Model
+const Favourite = require("../models/favourite");
 
 exports.getIndex = (req, res, next) => {
   Home.fetchAll((registeredHomes) => {
@@ -18,6 +18,19 @@ exports.getHomeList = (req, res, next) => {
       pageTitle: "Homes List",
       currentPage: "home-list",
       registeredHomes: registeredHomes,
+      isSearch: false, // ✅ Tells View: This is the normal list
+    });
+  });
+};
+
+exports.getSearch = (req, res, next) => {
+  const query = req.query.query;
+  Home.search(query, (searchResults) => {
+    res.render("store/home-list", {
+      pageTitle: `Search results for "${query}"`,
+      currentPage: "home-list",
+      registeredHomes: searchResults,
+      isSearch: true, // ✅ Tells View: This is a search result
     });
   });
 };
@@ -27,7 +40,6 @@ exports.getHomeDetails = (req, res, next) => {
   Home.fetchAll((homes) => {
     const home = homes.find((h) => h.id === homeId);
     if (!home) return res.redirect("/homes");
-
     res.render("store/home-detail", {
       pageTitle: "Home Detail",
       currentPage: "home-list",
@@ -36,13 +48,10 @@ exports.getHomeDetails = (req, res, next) => {
   });
 };
 
-// ✅ NEW: Logic to Show Favourites
 exports.getFavouriteList = (req, res, next) => {
   Favourite.getFavourites((favIds) => {
     Home.fetchAll((homes) => {
-      // Filter homes: Keep only the ones whose IDs are in the favIds list
       const favouriteHomes = homes.filter(home => favIds.includes(home.id));
-
       res.render("store/favourite-list", {
         pageTitle: "My Favourites",
         currentPage: "favourites",
@@ -52,7 +61,6 @@ exports.getFavouriteList = (req, res, next) => {
   });
 };
 
-// ✅ NEW: Logic to Add to Favourites
 exports.postAddToFavourite = (req, res, next) => {
   const homeId = req.body.homeId;
   Favourite.addToFavourites(homeId, () => {
@@ -60,7 +68,6 @@ exports.postAddToFavourite = (req, res, next) => {
   });
 };
 
-// ✅ NEW: Logic to Remove from Favourites
 exports.postRemoveFavourite = (req, res, next) => {
   const homeId = req.body.homeId;
   Favourite.deleteById(homeId, () => {
@@ -83,7 +90,6 @@ exports.getReserve = (req, res, next) => {
   Home.fetchAll((homes) => {
     const home = homes.find((h) => h.id === homeId);
     if (!home) return res.redirect("/homes");
-
     res.render("store/reserve", {
       pageTitle: "Confirm Booking",
       currentPage: "home-list",
@@ -95,12 +101,10 @@ exports.getReserve = (req, res, next) => {
 
 exports.postBooking = (req, res, next) => {
   const { homeId, homeName, pricePerNight, checkIn, checkOut, firstName, lastName, phone, email, guests } = req.body;
-
   const date1 = new Date(checkIn);
   const date2 = new Date(checkOut);
   const diffDays = Math.ceil(Math.abs(date2 - date1) / (1000 * 60 * 60 * 24)); 
   const totalPrice = diffDays * pricePerNight;
-
   const booking = new Booking(homeId, homeName, checkIn, checkOut, totalPrice, firstName, lastName, phone, email, guests);
   booking.save();
   res.redirect("/bookings");

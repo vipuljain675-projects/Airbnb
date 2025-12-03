@@ -1,13 +1,28 @@
 <header>
   <nav>
-    <ul>
-      <li><a href="/" class="<%= currentPage === 'index' ? 'active' : '' %>">Home</a></li>
-      <li><a href="/homes" class="<%= currentPage === 'home-list' ? 'active' : '' %>">All Homes</a></li>
-      <li><a href="/bookings" class="<%= currentPage === 'bookings' ? 'active' : '' %>">Bookings</a></li>
-      <li><a href="/favourites" class="<%= currentPage === 'favourites' ? 'active' : '' %>">Favorites</a></li>
-      <div style="width: 1px; height: 20px; background: #ddd;"></div>
-      <li><a href="/host/host-home-list" class="<%= currentPage === 'host-homes' ? 'active' : '' %>">Host Dashboard</a></li>
-      <li><a href="/host/add-home" class="<%= currentPage === 'addHome' ? 'active' : '' %>">Airbnb your Home</a></li>
+    
+    <a href="/" style="text-decoration: none; color: var(--airbnb-red); font-weight: 700; font-size: 1.5rem; display: flex; align-items: center; gap: 5px;">
+      <span style="font-size: 2rem;">⌂</span> airbnb
+    </a>
+
+    <form action="/search" method="GET" class="search-bar-container">
+        <input 
+            type="text" 
+            name="query" 
+            class="search-input"
+            placeholder="Search destinations" 
+            required
+        >
+        <button type="submit" class="search-btn">🔍</button>
+    </form>
+
+    <ul class="nav-links">
+      <li><a href="/homes" class="<%= currentPage === 'home-list' ? 'active' : '' %>">Homes</a></li>
+      <li><a href="/bookings" class="<%= currentPage === 'bookings' ? 'active' : '' %>">Trips</a></li>
+      <li><a href="/favourites" class="<%= currentPage === 'favourites' ? 'active' : '' %>">Saved</a></li>
+      <div style="width: 1px; height: 24px; background: #ddd;"></div>
+      <li><a href="/host/host-home-list" style="font-size: 0.85rem; color: #555;">Switch to Host</a></li>
     </ul>
+
   </nav>
 </header>

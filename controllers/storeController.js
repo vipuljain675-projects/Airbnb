@@ -109,3 +109,13 @@ exports.postBooking = (req, res, next) => {
   booking.save();
   res.redirect("/bookings");
 };
+
+// ✅ NEW: Handle Booking Cancellation
+exports.postCancelBooking = (req, res, next) => {
+  const bookingId = req.body.bookingId;
+  
+  Booking.deleteById(bookingId, () => {
+    // Once deleted, reload the bookings page
+    res.redirect("/bookings");
+  });
+};

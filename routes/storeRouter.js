@@ -15,4 +15,7 @@ router.post("/favourites/delete", storeController.postRemoveFavourite);
 // ✅ NEW SEARCH ROUTE
 router.get("/search", storeController.getSearch);
 
+// ✅ NEW: Route for Cancelling
+router.post("/bookings/delete", storeController.postCancelBooking);
+
 module.exports = router;

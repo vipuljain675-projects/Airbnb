@@ -1,4 +1,4 @@
-/* --- 1. FONTS & GLOBALS --- */
+/* --- 1. FONTS & GLOBALS (YOUR ORIGINAL) --- */
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap');
 
 :root {
@@ -15,7 +15,7 @@ body {
   background-color: #fff;
 }
 
-/* --- 2. THE AIRBNB RED BUTTONS --- */
+/* --- 2. THE AIRBNB RED BUTTONS (YOUR ORIGINAL) --- */
 .btn-primary {
   background-color: var(--airbnb-red) !important;
   border-color: var(--airbnb-red) !important;
@@ -40,7 +40,7 @@ body {
   color: white !important;
 }
 
-/* --- 3. CARDS --- */
+/* --- 3. CARDS (YOUR ORIGINAL) --- */
 .card {
   border: none !important;
   border-radius: var(--card-radius) !important;
@@ -58,7 +58,7 @@ body {
   object-fit: cover;
 }
 
-/* --- 4. THE REAL BOARDING PASS TICKET --- */
+/* --- 4. THE REAL BOARDING PASS TICKET (YOUR ORIGINAL) --- */
 .boarding-pass {
   background: white;
   border-radius: 16px;
@@ -106,3 +106,43 @@ body {
 
 .pass-label { font-size: 0.75rem; text-transform: uppercase; color: var(--gray); font-weight: 600; }
 .pass-value { font-size: 1.1rem; font-weight: 600; color: var(--dark); }
+
+
+/* --- 5. 👇 NEW: SEXY UPLOAD BUTTON STYLES --- */
+#imagePreview {
+  background-color: #f8f9fa;
+  cursor: pointer;
+  border: 2px dashed #ccc;
+  transition: all 0.3s ease;
+}
+
+/* Hover effect: Turns border red and slightly scales up */
+#imagePreview:hover {
+  background-color: #fff !important;
+  border-color: var(--airbnb-red) !important;
+  background-image: repeating-linear-gradient(
+    45deg,
+    #fff,
+    #fff 10px,
+    #fafafa 10px,
+    #fafafa 20px
+  );
+  transform: scale(1.01);
+}
+
+/* Animation for when the image appears */
+#imagePreview img {
+  animation: fadeIn 0.4s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+/* --- 6. 👇 NEW: MAP STYLES --- */
+#map {
+  border-radius: 16px; 
+  border: 1px solid #e0e0e0;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}

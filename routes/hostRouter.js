@@ -1,19 +1,36 @@
 const express = require("express");
 const hostController = require("../controllers/hostController");
+const path = require("path");
+const multer = require("multer"); // 1. Import Multer
+
 const router = express.Router();
 
-// 1. Add Home (Get Form & Post Data)
-router.get("/add-home", hostController.getAddHome);
-router.post("/add-home", hostController.postAddHome);
+// 2. Configure Storage Engine
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "uploads/"); // Save files to 'uploads' folder
+  },
+  filename: (req, file, cb) => {
+    // Rename file: 2025-12-23-myimage.png
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    cb(null, uniqueSuffix + '-' + file.originalname);
+  }
+});
 
-// 2. Host Home List (The Dashboard)
+// 3. Initialize Multer
+const upload = multer({ storage: storage });
+
+// 4. Routes
+router.get("/add-home", hostController.getAddHome);
+
+// 👇 Apply middleware to routes that accept files
+router.post("/add-home", upload.single("photo"), hostController.postAddHome);
+
 router.get("/host-home-list", hostController.getHostHomes);
 
-// 3. Edit Home (Get Form & Post Data)
 router.get("/edit-home/:homeId", hostController.getEditHome);
-router.post("/edit-home", hostController.postEditHome);
+router.post("/edit-home", upload.single("photo"), hostController.postEditHome);
 
-// 4. Delete Home (THE MISSING ROUTE 👇)
 router.post("/delete-home/:homeId", hostController.postDeleteHome);
 
-module.exports = { router }; // Note: Ensure your app.js imports this correctly!
+module.exports = { router };

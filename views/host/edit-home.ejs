@@ -3,7 +3,7 @@
 <body>
   <%- include('../partials/nav') %>
 
-  <main class="container mt-5">
+  <main class="container mt-5 mb-5">
     <div class="row justify-content-center">
       <div class="col-md-8">
         <div class="card shadow border-0 rounded-4">
@@ -14,7 +14,7 @@
           </div>
           
           <div class="card-body p-4">
-            <form action="/host/<%= editing ? 'edit-home' : 'add-home' %>" method="POST">
+            <form action="/host/<%= editing ? 'edit-home' : 'add-home' %>" method="POST" enctype="multipart/form-data">
               
               <div class="row mb-3">
                 <div class="col-md-8">
@@ -45,12 +45,35 @@
                 </div>
               </div>
 
-              <div class="mb-3">
-                <label class="form-label fw-bold">Photo URL</label>
-                <input type="text" name="photoUrl" class="form-control p-3" 
-                       value="<%= editing ? home.photoUrl : '' %>" placeholder="https://..." required>
-              </div>
+              <div class="mb-4">
+                <label class="form-label fw-bold">Property Image</label>
+                
+                <label for="imageUpload" class="d-block" style="cursor: pointer;">
+                  
+                  <div id="imagePreview" 
+                       class="rounded-4 d-flex flex-column align-items-center justify-content-center bg-light position-relative overflow-hidden" 
+                       style="height: 300px; width: 100%; border: 2px dashed #ccc; transition: all 0.3s;">
+                    
+                    <% if (editing && home.photoUrl) { %>
+                       <img src="<%= home.photoUrl %>" class="w-100 h-100" style="object-fit: cover;">
+                       <div class="position-absolute bottom-0 start-0 w-100 bg-dark bg-opacity-50 text-white text-center py-2 small">
+                         Click to change photo
+                       </div>
+                    <% } else { %>
+                       <i class="bi bi-plus-circle-dotted text-muted" style="font-size: 3rem;"></i>
+                       <p class="text-muted mt-2 mb-0">Upload a photo</p>
+                    <% } %>
 
+                  </div>
+                  
+                  <input type="file" id="imageUpload" name="photo" class="d-none" accept="image/*" 
+                         <%= editing ? '' : 'required' %> onchange="previewImage(event)">
+                </label>
+
+                <% if (editing) { %>
+                  <input type="hidden" name="oldPhotoUrl" value="<%= home.photoUrl %>">
+                <% } %>
+              </div>
               <div class="mb-4">
                 <label class="form-label fw-bold">Description</label>
                 <textarea name="description" class="form-control p-3" rows="4" 
@@ -73,5 +96,34 @@
       </div>
     </div>
   </main>
+
+  <script>
+    function previewImage(event) {
+      const file = event.target.files[0];
+      const previewContainer = document.getElementById('imagePreview');
+      
+      if (file) {
+        const reader = new FileReader();
+        
+        reader.onload = function(e) {
+          // Replace content with the new image
+          previewContainer.innerHTML = `
+            <img src="${e.target.result}" class="w-100 h-100" style="object-fit: cover; animation: fadeIn 0.5s;">
+          `;
+          // Change border to solid green to indicate success
+          previewContainer.style.border = '2px solid #198754';
+        }
+        
+        reader.readAsDataURL(file);
+      }
+    }
+  </script>
+
+  <style>
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+  </style>
 </body>
 </html>

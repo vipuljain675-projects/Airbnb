@@ -19,11 +19,13 @@
 
     <div class="row">
       <div class="col-lg-8">
+        
         <div class="border-bottom pb-4 mb-4">
           <h3>Hosted by a Superhost</h3>
           <p class="lead"><%= home.description %></p>
         </div>
-        <div>
+
+        <div class="border-bottom pb-4 mb-4">
           <h4>What this place offers</h4>
           <ul class="list-unstyled mt-3 fs-5">
             <li class="mb-2"><i class="bi bi-wifi me-3"></i> Fast Wifi</li>
@@ -31,6 +33,12 @@
             <li class="mb-2"><i class="bi bi-snow me-3"></i> Air Conditioning</li>
             <li class="mb-2"><i class="bi bi-tv me-3"></i> HD TV</li>
           </ul>
+        </div>
+
+        <div class="mb-4">
+          <h4 class="mb-3">Where you'll be</h4>
+          <div id="map" class="rounded-4 border" style="height: 480px; width: 100%; z-index: 1;"></div>
+          <p class="mt-3 text-muted small"><%= home.location %></p>
         </div>
       </div>
 
@@ -63,5 +71,48 @@
       </div>
     </div>
   </main>
+
+  <script>
+    // 1. Get the location from the server-side EJS variable
+    const locationName = "<%= home.location %>";
+
+    // 2. Initialize the map (Default view: India)
+    const map = L.map('map').setView([20.5937, 78.9629], 5);
+
+    // 3. Add OpenStreetMap Tiles
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map);
+
+    // 4. Geocoding: Convert location name to Coordinates
+    // Using Nominatim API (Free, no key required)
+    if (locationName) {
+      fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(locationName)}`)
+        .then(response => response.json())
+        .then(data => {
+          if (data && data.length > 0) {
+            const lat = data[0].lat;
+            const lon = data[0].lon;
+            
+            // Move map to the found location
+            map.setView([lat, lon], 14);
+
+            // Add a marker
+            L.marker([lat, lon]).addTo(map)
+              .bindPopup(`<b>${locationName}</b><br>Exact location provided after booking.`)
+              .openPopup();
+            
+            // Add a circle to indicate general area (like Airbnb)
+            L.circle([lat, lon], {
+              color: '#ff385c',
+              fillColor: '#ff385c',
+              fillOpacity: 0.2,
+              radius: 500
+            }).addTo(map);
+          }
+        })
+        .catch(err => console.log("Map Error:", err));
+    }
+  </script>
 </body>
 </html>

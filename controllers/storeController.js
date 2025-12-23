@@ -10,7 +10,7 @@ exports.getIndex = (req, res, next) => {
 };
 
 exports.getHomeList = (req, res, next) => {
-  Home.fetchAll()
+  Home.find()
     .then((registeredHomes) => {
       res.render("store/home-list", {
         pageTitle: "Explore Homes",
@@ -24,7 +24,12 @@ exports.getHomeList = (req, res, next) => {
 
 exports.getSearch = (req, res, next) => {
   const query = req.query.query;
-  Home.search(query)
+  Home.find({
+    $or: [
+      { houseName: { $regex: query, $options: "i" } },
+      { location: { $regex: query, $options: "i" } }
+    ]
+  })
     .then((searchResults) => {
       res.render("store/home-list", {
         pageTitle: `Search results for "${query}"`,
@@ -50,19 +55,22 @@ exports.getHomeDetails = (req, res, next) => {
     .catch((err) => console.log(err));
 };
 
+// 👇 THIS IS THE CRITICAL FIX FOR THE CRASH
 exports.getFavouriteList = (req, res, next) => {
-  Favourite.getFavourites()
+  Favourite.find()
+    .populate('homeId') // 1. Get the full Home details
     .then((favourites) => {
-      const favHomeIds = favourites.map(f => f.homeId.toString());
-      Home.fetchAll().then((homes) => {
-        const favouriteHomes = homes.filter(home => 
-          favHomeIds.includes(home._id.toString())
-        );
-        res.render("store/favourite-list", {
-          pageTitle: "My Favourites",
-          currentPage: "favourites",
-          favouriteHomes: favouriteHomes,
-        });
+      
+      // 2. defensive coding: Filter out nulls
+      // If a home was deleted, 'fav.homeId' will be null. We remove it so the view doesn't crash.
+      const favouriteHomes = favourites
+        .map(fav => fav.homeId)
+        .filter(home => home !== null);
+
+      res.render("store/favourite-list", {
+        pageTitle: "My Favourites",
+        currentPage: "favourites",
+        favouriteHomes: favouriteHomes,
       });
     })
     .catch((err) => console.log(err));
@@ -70,20 +78,22 @@ exports.getFavouriteList = (req, res, next) => {
 
 exports.postAddToFavourite = (req, res, next) => {
   const homeId = req.body.homeId;
-  Favourite.addToFavourites(homeId)
+  const fav = new Favourite({ homeId: homeId });
+  
+  fav.save()
     .then(() => res.redirect("/favourites"))
     .catch((err) => console.log(err));
 };
 
 exports.postRemoveFavourite = (req, res, next) => {
   const homeId = req.body.homeId;
-  Favourite.deleteById(homeId)
+  Favourite.findOneAndDelete({ homeId: homeId })
     .then(() => res.redirect("/favourites"))
     .catch((err) => console.log(err));
 };
 
 exports.getBookings = (req, res, next) => {
-  Booking.fetchAll()
+  Booking.find()
     .then((bookings) => {
       res.render("store/bookings", {
         pageTitle: "My Bookings",
@@ -98,7 +108,6 @@ exports.getReserve = (req, res, next) => {
   const homeId = req.params.homeId;
   Home.findById(homeId)
     .then((home) => {
-      if (!home) return res.redirect("/homes");
       res.render("store/reserve", {
         pageTitle: "Confirm Booking",
         currentPage: "home-list",
@@ -111,12 +120,19 @@ exports.getReserve = (req, res, next) => {
 
 exports.postBooking = (req, res, next) => {
   const { homeId, homeName, pricePerNight, checkIn, checkOut, firstName, lastName, phone, email } = req.body;
+  
+  // Calculate Total Price
   const date1 = new Date(checkIn);
   const date2 = new Date(checkOut);
   const diffDays = Math.ceil(Math.abs(date2 - date1) / (1000 * 60 * 60 * 24)); 
   const totalPrice = diffDays * pricePerNight;
   
-  const booking = new Booking(homeId, homeName, checkIn, checkOut, totalPrice, firstName, lastName, phone, email);
+  const booking = new Booking({
+    homeId, homeName, 
+    startDate: checkIn, 
+    endDate: checkOut, 
+    totalPrice, firstName, lastName, phone, email
+  });
   
   booking.save()
     .then(() => res.redirect("/bookings"))
@@ -125,7 +141,7 @@ exports.postBooking = (req, res, next) => {
 
 exports.postCancelBooking = (req, res, next) => {
   const bookingId = req.body.bookingId;
-  Booking.deleteById(bookingId)
+  Booking.findByIdAndDelete(bookingId)
     .then(() => res.redirect("/bookings"))
     .catch((err) => console.log(err));
 };

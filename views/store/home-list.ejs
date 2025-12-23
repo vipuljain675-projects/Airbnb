@@ -2,55 +2,38 @@
 </head>
 <body>
   <%- include('../partials/nav') %>
-
   <main class="container mt-4">
     <h2 class="mb-4 fw-bold">Explore Homes</h2>
-    
     <div class="row">
       <% if (registeredHomes.length > 0) { %>
         <% for (let home of registeredHomes) { %>
           <div class="col-md-6 col-lg-3 mb-4">
             <div class="card h-100 border-0 shadow-card">
               <div class="position-relative">
-                
                 <% const cover = Array.isArray(home.photoUrl) ? home.photoUrl[0] : home.photoUrl %>
-                <img src="<%= cover %>" class="card-img-top rounded-3" alt="<%= home.houseName %>" style="height: 250px; object-fit: cover;">
-                
+                <img src="<%= cover %>" class="card-img-top rounded-3" style="height: 250px; object-fit: cover;">
                 <span class="position-absolute top-0 end-0 m-2 badge bg-light text-dark shadow-sm">⭐ <%= home.rating %></span>
               </div>
-              
               <div class="card-body px-2">
-                <div class="d-flex justify-content-between align-items-start">
-                  <h5 class="card-title fw-bold mb-0"><%= home.houseName %></h5>
-                </div>
+                <h5 class="card-title fw-bold mb-0"><%= home.houseName %></h5>
                 <p class="text-muted small mb-2"><%= home.location %></p>
-                <p class="card-text">
-                  <span class="fw-bold">₹<%= home.price %></span> night
-                </p>
-
+                <p class="card-text"><span class="fw-bold">₹<%= home.price %></span> night</p>
                 <div class="d-flex justify-content-between align-items-center mt-3 pt-3 border-top">
-                  
-                  <div class="d-flex gap-2">
+                   <div class="d-flex gap-2">
                     <a href="/homes/<%= home._id %>" class="btn btn-sm btn-outline-primary">Details</a>
                     <a href="/reserve/<%= home._id %>" class="btn btn-sm btn-primary">Book</a>
-                  </div>
-
-                  <form action="/favourites/add" method="POST" class="d-inline">
+                   </div>
+                   <form action="/favourites/add" method="POST" class="d-inline">
                     <input type="hidden" name="homeId" value="<%= home._id %>">
-                    <button type="submit" class="btn btn-sm btn-light border rounded-circle text-danger shadow-sm" title="Add to Favourites">
-                      <i class="bi bi-heart-fill"></i>
-                    </button>
+                    <button type="submit" class="btn btn-sm btn-light border rounded-circle text-danger"><i class="bi bi-heart-fill"></i></button>
                   </form>
-
                 </div>
-                </div>
+              </div>
             </div>
           </div>
         <% } %>
       <% } else { %>
-        <div class="text-center w-100 mt-5">
-          <h3>No homes found!</h3>
-        </div>
+        <div class="text-center w-100 mt-5"><h3>No homes found!</h3></div>
       <% } %>
     </div>
   </main>

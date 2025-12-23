@@ -1,44 +1,15 @@
-const mongodb = require('mongodb');
-const getDb = require("../utils/databaseUtils").getDb;
+const mongoose = require('mongoose');
 
-module.exports = class Booking {
-  constructor(homeId, homeName, startDate, endDate, totalPrice, firstName, lastName, phone, email) {
-    this.homeId = new mongodb.ObjectId(homeId); // Store link to home
-    this.homeName = homeName; // We can duplicate this for easier access in NoSQL
-    this.startDate = startDate;
-    this.endDate = endDate;
-    this.totalPrice = totalPrice;
-    this.firstName = firstName;
-    this.lastName = lastName;
-    this.phone = phone;
-    this.email = email;
-  }
+const bookingSchema = new mongoose.Schema({
+  homeId: { type: mongoose.Schema.Types.ObjectId, ref: 'Home', required: true },
+  homeName: { type: String, required: true },
+  startDate: { type: String, required: true },
+  endDate: { type: String, required: true },
+  totalPrice: { type: Number, required: true },
+  firstName: { type: String, required: true },
+  lastName: { type: String, required: true },
+  phone: { type: String, required: true },
+  email: { type: String, required: true }
+});
 
-  save() {
-    const db = getDb();
-    return db.collection("bookings")
-      .insertOne(this)
-      .then(result => console.log("✅ Booking Added"))
-      .catch(err => console.log(err));
-  }
-
-  static fetchAll() {
-    const db = getDb();
-    // We simple fetch all bookings
-    return db.collection("bookings")
-      .find()
-      .toArray()
-      .then(bookings => {
-        return bookings;
-      })
-      .catch(err => console.log(err));
-  }
-
-  static deleteById(bookingId) {
-    const db = getDb();
-    return db.collection("bookings")
-      .deleteOne({ _id: new mongodb.ObjectId(bookingId) })
-      .then(() => console.log("Booking Deleted"))
-      .catch(err => console.log(err));
-  }
-};
+module.exports = mongoose.model('Booking', bookingSchema);

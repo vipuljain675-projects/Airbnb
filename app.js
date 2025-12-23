@@ -11,12 +11,9 @@ app.set("view engine", "ejs");
 app.set("views", "views");
 
 app.use(express.urlencoded({ extended: false }));
-
-// 1. Serve Static CSS/JS from 'public'
 app.use(express.static(path.join(__dirname, "public")));
 
-// 2. 👇 NEW: Serve Uploaded Images from 'uploads'
-// This creates a tunnel: URLs starting with /uploads will look inside the uploads folder
+// 👇 IMPORTANT: Allow browser to access uploaded images
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 app.use(storeRouter);

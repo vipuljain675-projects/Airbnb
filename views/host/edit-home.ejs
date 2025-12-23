@@ -46,34 +46,31 @@
               </div>
 
               <div class="mb-4">
-                <label class="form-label fw-bold">Property Image</label>
-                
+                <label class="form-label fw-bold">Property Images (Max 3)</label>
                 <label for="imageUpload" class="d-block" style="cursor: pointer;">
                   
-                  <div id="imagePreview" 
-                       class="rounded-4 d-flex flex-column align-items-center justify-content-center bg-light position-relative overflow-hidden" 
-                       style="height: 300px; width: 100%; border: 2px dashed #ccc; transition: all 0.3s;">
-                    
+                  <div id="imagePreview" class="rounded-4 d-flex align-items-center justify-content-start bg-light p-3 gap-3 border border-2 border-dashed" style="min-height: 150px; flex-wrap: wrap;">
                     <% if (editing && home.photoUrl) { %>
-                       <img src="<%= home.photoUrl %>" class="w-100 h-100" style="object-fit: cover;">
-                       <div class="position-absolute bottom-0 start-0 w-100 bg-dark bg-opacity-50 text-white text-center py-2 small">
-                         Click to change photo
-                       </div>
+                       <% const urls = Array.isArray(home.photoUrl) ? home.photoUrl : [home.photoUrl]; %>
+                       <% urls.forEach(url => { %>
+                         <img src="<%= url %>" class="rounded shadow-sm" style="width: 100px; height: 100px; object-fit: cover;">
+                       <% }) %>
                     <% } else { %>
-                       <i class="bi bi-plus-circle-dotted text-muted" style="font-size: 3rem;"></i>
-                       <p class="text-muted mt-2 mb-0">Upload a photo</p>
+                       <div class="text-center w-100 text-muted">
+                         <i class="bi bi-cloud-arrow-up display-4"></i>
+                         <p class="mb-0">Click to upload</p>
+                       </div>
                     <% } %>
-
                   </div>
-                  
-                  <input type="file" id="imageUpload" name="photo" class="d-none" accept="image/*" 
-                         <%= editing ? '' : 'required' %> onchange="previewImage(event)">
-                </label>
 
+                  <input type="file" id="imageUpload" name="photos" class="d-none" multiple max="3" accept="image/*" onchange="previewImages(event)">
+                </label>
+                
                 <% if (editing) { %>
-                  <input type="hidden" name="oldPhotoUrl" value="<%= home.photoUrl %>">
+                  <input type="hidden" name="oldPhotoUrls" value="<%= home.photoUrl %>">
                 <% } %>
               </div>
+
               <div class="mb-4">
                 <label class="form-label fw-bold">Description</label>
                 <textarea name="description" class="form-control p-3" rows="4" 
@@ -98,32 +95,28 @@
   </main>
 
   <script>
-    function previewImage(event) {
-      const file = event.target.files[0];
+    function previewImages(event) {
+      const files = event.target.files;
       const previewContainer = document.getElementById('imagePreview');
-      
-      if (file) {
-        const reader = new FileReader();
-        
-        reader.onload = function(e) {
-          // Replace content with the new image
-          previewContainer.innerHTML = `
-            <img src="${e.target.result}" class="w-100 h-100" style="object-fit: cover; animation: fadeIn 0.5s;">
-          `;
-          // Change border to solid green to indicate success
-          previewContainer.style.border = '2px solid #198754';
-        }
-        
-        reader.readAsDataURL(file);
+      previewContainer.innerHTML = '';
+      previewContainer.className = 'rounded-4 d-flex align-items-center justify-content-start bg-white p-3 gap-3 border border-2 border-primary'; // Active Style
+
+      if (files.length > 0) {
+        Array.from(files).forEach(file => {
+          const reader = new FileReader();
+          reader.onload = function(e) {
+            const img = document.createElement('img');
+            img.src = e.target.result;
+            img.className = 'rounded shadow-sm animate__animated animate__fadeIn';
+            img.style.width = '100px'; 
+            img.style.height = '100px'; 
+            img.style.objectFit = 'cover';
+            previewContainer.appendChild(img);
+          }
+          reader.readAsDataURL(file);
+        });
       }
     }
   </script>
-
-  <style>
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
-    }
-  </style>
 </body>
 </html>

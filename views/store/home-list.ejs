@@ -12,7 +12,10 @@
           <div class="col-md-6 col-lg-3 mb-4">
             <div class="card h-100 border-0 shadow-card">
               <div class="position-relative">
-                <img src="<%= home.photoUrl %>" class="card-img-top rounded-3" alt="<%= home.houseName %>" style="height: 250px; object-fit: cover;">
+                
+                <% const cover = Array.isArray(home.photoUrl) ? home.photoUrl[0] : home.photoUrl %>
+                <img src="<%= cover %>" class="card-img-top rounded-3" alt="<%= home.houseName %>" style="height: 250px; object-fit: cover;">
+                
                 <span class="position-absolute top-0 end-0 m-2 badge bg-light text-dark shadow-sm">⭐ <%= home.rating %></span>
               </div>
               
@@ -26,19 +29,21 @@
                 </p>
 
                 <div class="d-flex justify-content-between align-items-center mt-3 pt-3 border-top">
-                  <a href="/homes/<%= home._id %>" class="btn btn-sm btn-outline-primary">Details</a>
                   
-                  <a href="/reserve/<%= home._id %>" class="btn btn-sm btn-primary">Book</a>
+                  <div class="d-flex gap-2">
+                    <a href="/homes/<%= home._id %>" class="btn btn-sm btn-outline-primary">Details</a>
+                    <a href="/reserve/<%= home._id %>" class="btn btn-sm btn-primary">Book</a>
+                  </div>
 
                   <form action="/favourites/add" method="POST" class="d-inline">
                     <input type="hidden" name="homeId" value="<%= home._id %>">
-                    <button type="submit" class="btn btn-sm btn-light border rounded-circle text-danger">
+                    <button type="submit" class="btn btn-sm btn-light border rounded-circle text-danger shadow-sm" title="Add to Favourites">
                       <i class="bi bi-heart-fill"></i>
                     </button>
                   </form>
-                </div>
 
-              </div>
+                </div>
+                </div>
             </div>
           </div>
         <% } %>

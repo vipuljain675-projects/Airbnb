@@ -1,6 +1,7 @@
 const Home = require("../models/home");
 
 exports.getAddHome = (req, res, next) => {
+  // 👇 Uses 'edit-home' view for adding
   res.render("host/edit-home", {
     pageTitle: "Add Home",
     currentPage: "addHome",
@@ -29,12 +30,16 @@ exports.getEditHome = (req, res, next) => {
 
 exports.postAddHome = (req, res, next) => {
   const { houseName, price, location, rating, description } = req.body;
-  const image = req.file; // Captured by Multer
+  const files = req.files; // 👇 Access array of files
 
-  // Construct path relative to root, e.g., "/uploads/123-house.jpg"
-  const photoUrl = image ? "/" + image.path : "https://placehold.co/600x400"; 
+  let photoUrls = [];
+  if (files && files.length > 0) {
+    photoUrls = files.map(file => "/" + file.path);
+  } else {
+    photoUrls = ["https://placehold.co/600x400"];
+  }
 
-  const home = new Home(houseName, price, location, rating, photoUrl, description);
+  const home = new Home(houseName, price, location, rating, photoUrls, description);
   
   home.save()
     .then(() => {
@@ -47,13 +52,20 @@ exports.postAddHome = (req, res, next) => {
 };
 
 exports.postEditHome = (req, res, next) => {
-  const { id, houseName, price, location, rating, description, oldPhotoUrl } = req.body;
-  const image = req.file;
+  const { id, houseName, price, location, rating, description, oldPhotoUrls } = req.body;
+  const files = req.files;
 
-  // Logic: Use new image path if uploaded, otherwise keep the old path
-  const photoUrl = image ? "/" + image.path : oldPhotoUrl;
+  let photoUrls;
+  if (files && files.length > 0) {
+    photoUrls = files.map(file => "/" + file.path);
+  } else {
+    // Handle legacy comma-separated string vs new array logic if needed, 
+    // but usually hidden input sends a string we might need to split.
+    // For safety with arrays in HTML values, it's often a comma string.
+    photoUrls = oldPhotoUrls ? oldPhotoUrls.split(',') : [];
+  }
 
-  const home = new Home(houseName, price, location, rating, photoUrl, description, id);
+  const home = new Home(houseName, price, location, rating, photoUrls, description, id);
   home.save()
     .then(() => res.redirect("/host/host-home-list"))
     .catch((err) => console.log(err));

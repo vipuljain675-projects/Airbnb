@@ -6,38 +6,50 @@
   <main class="container mt-4 mb-5">
     <div class="mb-3">
       <h2 class="fw-bold"><%= home.houseName %></h2>
-      <p class="small text-muted">
-        ⭐ <%= home.rating %> · <span class="text-decoration-underline"><%= home.location %></span>
-      </p>
+      <p class="small text-muted">⭐ <%= home.rating %> · <span class="text-decoration-underline"><%= home.location %></span></p>
     </div>
 
     <div class="row mb-4">
       <div class="col-12">
-        <img src="<%= home.photoUrl %>" class="img-fluid rounded-4 w-100" style="height: 450px; object-fit: cover;" alt="<%= home.houseName %>">
+        <% const photos = Array.isArray(home.photoUrl) ? home.photoUrl : [home.photoUrl] %>
+        
+        <div id="homeCarousel" class="carousel slide rounded-4 overflow-hidden shadow-sm" data-bs-ride="carousel">
+          <div class="carousel-indicators">
+            <% photos.forEach((_, index) => { %>
+              <button type="button" data-bs-target="#homeCarousel" data-bs-slide-to="<%= index %>" class="<%= index === 0 ? 'active' : '' %>"></button>
+            <% }) %>
+          </div>
+
+          <div class="carousel-inner">
+            <% photos.forEach((url, index) => { %>
+              <div class="carousel-item <%= index === 0 ? 'active' : '' %>">
+                <img src="<%= url %>" class="d-block w-100" style="height: 500px; object-fit: cover;">
+              </div>
+            <% }) %>
+          </div>
+
+          <% if (photos.length > 1) { %>
+            <button class="carousel-control-prev" type="button" data-bs-target="#homeCarousel" data-bs-slide="prev">
+              <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            </button>
+            <button class="carousel-control-next" type="button" data-bs-target="#homeCarousel" data-bs-slide="next">
+              <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            </button>
+          <% } %>
+        </div>
       </div>
     </div>
 
     <div class="row">
       <div class="col-lg-8">
-        
         <div class="border-bottom pb-4 mb-4">
           <h3>Hosted by a Superhost</h3>
           <p class="lead"><%= home.description %></p>
         </div>
-
-        <div class="border-bottom pb-4 mb-4">
-          <h4>What this place offers</h4>
-          <ul class="list-unstyled mt-3 fs-5">
-            <li class="mb-2"><i class="bi bi-wifi me-3"></i> Fast Wifi</li>
-            <li class="mb-2"><i class="bi bi-car-front me-3"></i> Free Parking</li>
-            <li class="mb-2"><i class="bi bi-snow me-3"></i> Air Conditioning</li>
-            <li class="mb-2"><i class="bi bi-tv me-3"></i> HD TV</li>
-          </ul>
-        </div>
-
+        
         <div class="mb-4">
-          <h4 class="mb-3">Where you'll be</h4>
-          <div id="map" class="rounded-4 border" style="height: 480px; width: 100%; z-index: 1;"></div>
+          <h4>Where you'll be</h4>
+          <div id="map" class="rounded-4 border" style="height: 400px; width: 100%; z-index: 1;"></div>
           <p class="mt-3 text-muted small"><%= home.location %></p>
         </div>
       </div>
@@ -45,74 +57,33 @@
       <div class="col-lg-4">
         <div class="card shadow border-1 p-4 sticky-top" style="top: 100px; border-radius: 12px;">
           <div class="d-flex justify-content-between align-items-center mb-3">
-            <div>
-              <span class="fs-3 fw-bold">₹<%= home.price %></span> <span class="text-muted">night</span>
-            </div>
-            <div class="small fw-bold">
-              ⭐ <%= home.rating %>
-            </div>
+            <div><span class="fs-3 fw-bold">₹<%= home.price %></span> <span class="text-muted">night</span></div>
+            <div class="small fw-bold">⭐ <%= home.rating %></div>
           </div>
-          
-          <div class="border rounded mb-3 p-3 text-center text-muted small bg-light">
-            Check availability on next page
-          </div>
-
-          <a href="/reserve/<%= home._id %>" class="btn btn-primary btn-lg w-100 fw-bold py-3 bg-gradient">
-            Reserve
-          </a>
-          
-          <div class="mt-3 text-center small text-muted">You won't be charged yet</div>
-          
-          <div class="mt-4 pt-3 border-top d-flex justify-content-between fw-bold">
-            <span>Total estimate</span>
-            <span>₹<%= home.price %></span>
-          </div>
+          <a href="/reserve/<%= home._id %>" class="btn btn-primary btn-lg w-100 fw-bold py-3">Reserve</a>
         </div>
       </div>
     </div>
   </main>
 
   <script>
-    // 1. Get the location from the server-side EJS variable
     const locationName = "<%= home.location %>";
-
-    // 2. Initialize the map (Default view: India)
     const map = L.map('map').setView([20.5937, 78.9629], 5);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '&copy; OpenStreetMap' }).addTo(map);
 
-    // 3. Add OpenStreetMap Tiles
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-    }).addTo(map);
-
-    // 4. Geocoding: Convert location name to Coordinates
-    // Using Nominatim API (Free, no key required)
     if (locationName) {
       fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(locationName)}`)
-        .then(response => response.json())
+        .then(res => res.json())
         .then(data => {
           if (data && data.length > 0) {
-            const lat = data[0].lat;
-            const lon = data[0].lon;
-            
-            // Move map to the found location
+            const { lat, lon } = data[0];
             map.setView([lat, lon], 14);
-
-            // Add a marker
-            L.marker([lat, lon]).addTo(map)
-              .bindPopup(`<b>${locationName}</b><br>Exact location provided after booking.`)
-              .openPopup();
-            
-            // Add a circle to indicate general area (like Airbnb)
-            L.circle([lat, lon], {
-              color: '#ff385c',
-              fillColor: '#ff385c',
-              fillOpacity: 0.2,
-              radius: 500
-            }).addTo(map);
+            L.marker([lat, lon]).addTo(map).bindPopup(`<b>${locationName}</b>`).openPopup();
           }
-        })
-        .catch(err => console.log("Map Error:", err));
+        });
     }
   </script>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

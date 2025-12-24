@@ -21,7 +21,7 @@ app.use("/host", hostRouter);
 
 app.use(errorsController.pageNotFound);
 
-const PORT = 3500;
+const PORT = 3600;
 
 // 2. Connect to Mongoose (This handles the DB connection now)
 // Note: 'airbnb' is the name of your database. Mongoose creates it if it doesn't exist.

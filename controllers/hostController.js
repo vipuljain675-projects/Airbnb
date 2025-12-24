@@ -24,7 +24,10 @@ exports.getEditHome = (req, res, next) => {
         home: home,
       });
     })
-    .catch((err) => console.log(err));
+    .catch((err) => {
+      console.log(err);
+      res.redirect("/host/host-home-list");
+    });
 };
 
 exports.postAddHome = (req, res, next) => {
@@ -39,7 +42,12 @@ exports.postAddHome = (req, res, next) => {
   }
 
   const home = new Home({
-    houseName, price, location, rating, photoUrl: photoUrls, description
+    houseName, 
+    price, 
+    location, 
+    rating, 
+    photoUrl: photoUrls, 
+    description
   });
   
   home.save()
@@ -49,7 +57,12 @@ exports.postAddHome = (req, res, next) => {
         currentPage: "addHome"
       });
     })
-    .catch((err) => console.log(err));
+    .catch((err) => {
+      // 👇 FIX FOR INFINITE LOADING
+      console.log("❌ Error saving home:", err);
+      // If validation fails (like missing Description), we redirect back so the page doesn't hang.
+      res.redirect("/host/add-home"); 
+    });
 };
 
 exports.postEditHome = (req, res, next) => {
@@ -64,16 +77,28 @@ exports.postEditHome = (req, res, next) => {
   }
 
   Home.findByIdAndUpdate(id, {
-    houseName, price, location, rating, photoUrl: photoUrls, description
+    houseName, 
+    price, 
+    location, 
+    rating, 
+    photoUrl: photoUrls, 
+    description
   })
     .then(() => res.redirect("/host/host-home-list"))
-    .catch((err) => console.log(err));
+    .catch((err) => {
+      console.log("❌ Error updating home:", err);
+      res.redirect("/host/host-home-list");
+    });
 };
 
 exports.postDeleteHome = (req, res, next) => {
-  Home.findByIdAndDelete(req.params.homeId)
+  const homeId = req.params.homeId;
+  Home.findByIdAndDelete(homeId)
     .then(() => res.redirect("/host/host-home-list"))
-    .catch((err) => console.log(err));
+    .catch((err) => {
+      console.log("❌ Error deleting home:", err);
+      res.redirect("/host/host-home-list");
+    });
 };
 
 exports.getHostHomes = (req, res, next) => {

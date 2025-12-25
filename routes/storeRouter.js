@@ -16,7 +16,7 @@ router.post("/favourite-remove", storeController.postRemoveFavourite);
 // --- Bookings (THIS IS THE KEY PART) ---
 // If this line is missing or not saved, you get a 404
 router.get("/bookings", storeController.getBookings); 
-router.post("/book", storeController.postBooking);
+router.post("/bookings", storeController.postBooking);
 router.post("/bookings/delete", storeController.postCancelBooking);
 
 // --- Search & Reserve ---

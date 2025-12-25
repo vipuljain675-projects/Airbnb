@@ -1,50 +1,47 @@
 <%- include('../partials/head') %>
 <body>
-  <%- include('../partials/nav') %>
-  
-  <main class="container my-4">
-    <h1 class="h3 mb-4">Explore Homes</h1>
-    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 g-4">
-      
-      <% if (homes.length > 0) { %>
-        <% for (let home of homes) { %>
-          <div class="col">
-            <div class="card h-100 shadow-sm">
-              <img src="<%= home.imageUrl %>" class="card-img-top" alt="<%= home.houseName %>" style="height: 200px; object-fit: cover;">
-              <div class="card-body">
-                <div class="d-flex justify-content-between align-items-center mb-2">
-                  <h5 class="card-title mb-0"><%= home.houseName %></h5>
-                  <span class="badge bg-primary">₹<%= home.price %></span>
-                </div>
-                <p class="card-text text-muted small"><%= home.location %></p>
-                
-                <div class="d-flex justify-content-between align-items-center mt-3">
-                  <a href="/homes/<%= home._id %>" class="btn btn-sm btn-outline-primary">Details</a>
-                  
-                  <div class="d-flex gap-2">
-                      <a href="/reserve/<%= home._id %>" class="btn btn-sm btn-primary">Book</a>
-                      
-                      <form action="/favourite" method="POST">
-                        <input type="hidden" name="homeId" value="<%= home._id %>">
-                        <button type="submit" class="btn btn-sm btn-danger">
-                          <i class="fa-regular fa-heart"></i>
-                        </button>
-                      </form>
-                  </div>
-                </div>
+<%- include('../partials/nav') %>
 
+<main class="container mt-4">
+  <h2 class="mb-4">
+    <%= isSearch ? "Search Results" : "Explore Homes" %>
+  </h2>
+
+  <div class="row">
+    <% if (homes.length > 0) { %>
+      <% homes.forEach(home => { %>
+        <div class="col-md-4 mb-4">
+          <div class="card h-100 shadow-sm">
+            <img src="<%= home.photoUrl[0] %>" 
+                 class="card-img-top"
+                 style="height:200px; object-fit:cover;">
+
+            <div class="card-body">
+              <h5 class="fw-bold"><%= home.houseName %></h5>
+              <p class="text-muted mb-1"><%= home.location %></p>
+              <p class="mb-2">₹<%= home.price %> / night</p>
+
+              <div class="d-flex justify-content-between">
+                <a href="/homes/<%= home._id %>" class="btn btn-outline-primary btn-sm">
+                  View
+                </a>
+
+                <form action="/favourite" method="POST">
+                  <input type="hidden" name="homeId" value="<%= home._id %>">
+                  <button class="btn btn-outline-danger btn-sm">
+                    ♥
+                  </button>
+                </form>
               </div>
             </div>
           </div>
-        <% } %>
-      <% } else { %>
-        <div class="col-12 text-center mt-5">
-            <h4 class="text-muted">No homes found!</h4>
         </div>
-      <% } %>
-      
-    </div>
-  </main>
-  
-  </body>
+      <% }) %>
+    <% } else { %>
+      <p>No homes found.</p>
+    <% } %>
+  </div>
+</main>
+
+</body>
 </html>

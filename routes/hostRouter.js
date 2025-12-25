@@ -1,30 +1,28 @@
-const express = require("express");
-const hostController = require("../controllers/hostController");
-const multer = require("multer");
+const express = require('express');
+const multer = require('multer');
+const hostController = require('../controllers/hostController');
 
 const router = express.Router();
 
 const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, "uploads/");
-  },
-  filename: (req, file, cb) => {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    cb(null, uniqueSuffix + '-' + file.originalname);
-  }
+  destination: (req, file, cb) => cb(null, 'uploads/'),
+  filename: (req, file, cb) => cb(null, Date.now() + '-' + file.originalname),
 });
 
-const upload = multer({ storage: storage });
+const upload = multer({ storage });
 
-// Routes
-router.get("/add-home", hostController.getAddHome);
-router.post("/add-home", upload.array("photos", 3), hostController.postAddHome);
+// HOST ENTRY POINT
+router.get('/', hostController.getHostDashboard);
 
-router.get("/host-home-list", hostController.getHostHomes);
+// ADD / EDIT
+router.get('/add-home', hostController.getAddHome);
+router.post('/add-home', upload.array('photos', 3), hostController.postAddHome);
 
-router.get("/edit-home/:homeId", hostController.getEditHome);
-router.post("/edit-home", upload.array("photos", 3), hostController.postEditHome);
+router.get('/host-home-list', hostController.getHostHomes);
 
-router.post("/delete-home/:homeId", hostController.postDeleteHome);
+router.get('/edit-home/:homeId', hostController.getEditHome);
+router.post('/edit-home', upload.array('photos', 3), hostController.postEditHome);
+
+router.post('/delete-home/:homeId', hostController.postDeleteHome);
 
 module.exports = router;

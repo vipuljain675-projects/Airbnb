@@ -1,98 +1,134 @@
 <%- include('../partials/head') %>
-</head>
-<body>
-  <%- include('../partials/nav') %>
+<body class="bg-light">
+<%- include('../partials/nav') %>
 
-  <main class="container mt-5 mb-5">
-    <div class="row justify-content-center">
-      <div class="col-md-8">
-        <div class="card shadow border-0 rounded-4">
-          <div class="card-header bg-white border-0 pt-4 px-4">
-            <h2 class="fw-bold text-center mb-0">
-              <%= editing ? "Edit your Home" : "List a new Home" %>
-            </h2>
-          </div>
-          
-          <div class="card-body p-4">
-            <form action="/host/<%= editing ? 'edit-home' : 'add-home' %>" method="POST" enctype="multipart/form-data">
-              
-              <div class="row mb-3">
-                <div class="col-md-8">
-                  <label class="form-label fw-bold">Property Name</label>
-                  <input type="text" name="houseName" class="form-control p-3" value="<%= editing ? home.houseName : '' %>" required>
+<main class="container mt-5 mb-5">
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+
+      <div class="card shadow-sm border-0 rounded-4">
+        <div class="card-body p-4">
+
+          <h2 class="fw-bold mb-4 text-center">
+            <%= editing ? "Edit your Home" : "Add a New Home" %>
+          </h2>
+
+          <form action="/host/<%= editing ? 'edit-home' : 'add-home' %>"
+                method="POST" enctype="multipart/form-data">
+
+            <% if (editing) { %>
+              <input type="hidden" name="id" value="<%= home._id %>">
+            <% } %>
+
+            <!-- Property Name -->
+            <div class="mb-3">
+              <label class="form-label fw-semibold">House Name</label>
+              <input type="text" name="houseName"
+                     class="form-control form-control-lg"
+                     value="<%= home.houseName || '' %>" required>
+            </div>
+
+            <!-- Price & Rating -->
+            <div class="row mb-3">
+              <div class="col">
+                <label class="form-label fw-semibold">Price / Night</label>
+                <input type="number" name="price"
+                       class="form-control form-control-lg"
+                       value="<%= home.price || '' %>" required>
+              </div>
+              <div class="col">
+                <label class="form-label fw-semibold">Rating</label>
+                <input type="number" step="0.1" name="rating"
+                       class="form-control form-control-lg"
+                       value="<%= home.rating || '' %>" required>
+              </div>
+            </div>
+
+            <!-- Location -->
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Location</label>
+              <input type="text" name="location"
+                     class="form-control form-control-lg"
+                     value="<%= home.location || '' %>" required>
+            </div>
+
+            <!-- IMAGE UPLOAD (FIXED UX) -->
+            <div class="mb-4">
+              <label class="form-label fw-semibold">Property Images (max 3)</label>
+
+              <label for="imageUpload"
+                     class="w-100 border rounded-4 p-4 text-center bg-white"
+                     style="cursor:pointer; border-style:dashed;">
+                <div id="imagePreview" class="d-flex gap-3 justify-content-center flex-wrap">
+                  <% if (editing && home.photoUrl) { %>
+                    <% home.photoUrl.forEach(img => { %>
+                      <img src="<%= img %>"
+                           class="rounded shadow-sm"
+                           style="width:100px;height:100px;object-fit:cover;">
+                    <% }) %>
+                  <% } else { %>
+                    <div class="text-muted">
+                      <div style="font-size:2.5rem;">＋</div>
+                      <div>Add photos</div>
+                    </div>
+                  <% } %>
                 </div>
-                <div class="col-md-4">
-                  <label class="form-label fw-bold">Price per Night</label>
-                  <input type="number" name="price" class="form-control p-3" value="<%= editing ? home.price : '' %>" required>
-                </div>
-              </div>
+              </label>
 
-              <div class="row mb-3">
-                <div class="col-md-8">
-                  <label class="form-label fw-bold">Location</label>
-                  <input type="text" name="location" class="form-control p-3" value="<%= editing ? home.location : '' %>" required>
-                </div>
-                <div class="col-md-4">
-                  <label class="form-label fw-bold">Rating</label>
-                  <input type="number" name="rating" class="form-control p-3" step="0.1" value="<%= editing ? home.rating : '' %>" required>
-                </div>
-              </div>
+              <input type="file"
+                     id="imageUpload"
+                     name="photos"
+                     class="d-none"
+                     multiple
+                     accept="image/*"
+                     onchange="previewImages(event)">
+            </div>
 
-              <div class="mb-4">
-                <label class="form-label fw-bold">Property Images (Max 3)</label>
-                <label for="imageUpload" class="d-block" style="cursor: pointer;">
-                  <div id="imagePreview" class="rounded-4 d-flex align-items-center justify-content-start bg-light p-3 gap-3 border border-2 border-dashed" style="min-height: 150px; flex-wrap: wrap;">
-                    <% if (editing && home.photoUrl) { %>
-                       <% const urls = Array.isArray(home.photoUrl) ? home.photoUrl : [home.photoUrl]; %>
-                       <% urls.forEach(url => { %>
-                         <img src="<%= url %>" class="rounded shadow-sm" style="width: 100px; height: 100px; object-fit: cover;">
-                       <% }) %>
-                    <% } else { %>
-                       <div class="text-center w-100 text-muted"><p class="mb-0">Click to upload</p></div>
-                    <% } %>
-                  </div>
-                  <input type="file" id="imageUpload" name="photos" class="d-none" multiple max="3" accept="image/*" onchange="previewImages(event)">
-                </label>
-                <% if (editing) { %> <input type="hidden" name="oldPhotoUrls" value="<%= home.photoUrl %>"> <% } %>
-              </div>
+            <!-- Description -->
+            <div class="mb-4">
+              <label class="form-label fw-semibold">Description</label>
+              <textarea name="description"
+                        class="form-control form-control-lg"
+                        rows="4"><%= home.description || '' %></textarea>
+            </div>
 
-              <div class="mb-4">
-                <label class="form-label fw-bold">Description</label>
-                <textarea name="description" class="form-control p-3" rows="4"><%= editing ? home.description : '' %></textarea>
-              </div>
+            <!-- Submit -->
+            <div class="d-grid">
+              <button class="btn btn-primary btn-lg">
+                <%= editing ? "Update Home" : "Add Home" %>
+              </button>
+            </div>
 
-              <% if (editing) { %> <input type="hidden" name="id" value="<%= home._id %>"> <% } %>
+          </form>
 
-              <div class="d-grid">
-                <button type="submit" class="btn btn-primary btn-lg fw-bold py-3"><%= editing ? "Update Home" : "Add Listing" %></button>
-              </div>
-
-            </form>
-          </div>
         </div>
       </div>
-    </div>
-  </main>
 
-  <script>
-    function previewImages(event) {
-      const files = event.target.files;
-      const previewContainer = document.getElementById('imagePreview');
-      previewContainer.innerHTML = '';
-      if (files.length > 0) {
-        Array.from(files).forEach(file => {
-          const reader = new FileReader();
-          reader.onload = function(e) {
-            const img = document.createElement('img');
-            img.src = e.target.result;
-            img.style.width = '100px'; img.style.height = '100px'; img.style.objectFit = 'cover';
-            img.className = 'rounded shadow-sm';
-            previewContainer.appendChild(img);
-          }
-          reader.readAsDataURL(file);
-        });
-      }
-    }
-  </script>
+    </div>
+  </div>
+</main>
+
+<script>
+  function previewImages(event) {
+    const files = event.target.files;
+    const preview = document.getElementById('imagePreview');
+    preview.innerHTML = '';
+
+    Array.from(files).forEach(file => {
+      const reader = new FileReader();
+      reader.onload = e => {
+        const img = document.createElement('img');
+        img.src = e.target.result;
+        img.style.width = '100px';
+        img.style.height = '100px';
+        img.style.objectFit = 'cover';
+        img.className = 'rounded shadow-sm';
+        preview.appendChild(img);
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+</script>
+
 </body>
 </html>

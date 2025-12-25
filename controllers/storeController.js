@@ -16,6 +16,8 @@ exports.getIndex = (req, res) => {
 exports.getHomeList = (req, res) => {
   Home.find()
     .then((homes) => {
+      console.log("HOMES FROM DB:", homes); // 👈 ADD THIS LINE
+
       res.render("store/home-list", {
         pageTitle: "Explore Homes",
         currentPage: "home-list",
@@ -25,6 +27,7 @@ exports.getHomeList = (req, res) => {
     })
     .catch(err => console.log(err));
 };
+
 
 /* =========================
    SEARCH (SINGLE, CLEAN)

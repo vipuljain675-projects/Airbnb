@@ -160,41 +160,62 @@ exports.getReserve = (req, res) => {
     .catch(err => console.log(err));
 };
 
-exports.postBooking = (req, res) => {
-  const { homeId, homeName, pricePerNight, checkIn, checkOut, adults, children, seniors } = req.body;
+exports.postBooking = (req, res, next) => {
+  const { homeId, checkIn, checkOut } = req.body;
 
-  const start = new Date(checkIn);
-  const end = new Date(checkOut);
+  const newCheckIn = new Date(checkIn);
+  const newCheckOut = new Date(checkOut);
 
-  // Calculate duration
-  const days = (end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24);
-
-  if (days <= 0) {
-    return res.redirect("/homes");
-  }
-
-  const totalPrice = Number(pricePerNight) * days;
-
-  // 🟢 Create Booking with Guests
-  const booking = new Booking({
-    homeId,
-    homeName,
-    userId: req.user._id,
-    checkIn: start,
-    checkOut: end,
-    totalPrice,
-    guests: {
-      adults: Number(adults),
-      children: Number(children),
-      seniors: Number(seniors)
+  // 1. COLLISION CHECK (Keep this logic)
+  Booking.find({
+    homeId: homeId,
+    $or: [
+      { checkIn: { $lte: newCheckIn }, checkOut: { $gte: newCheckIn } },
+      { checkIn: { $lte: newCheckOut }, checkOut: { $gte: newCheckOut } },
+      { checkIn: { $gte: newCheckIn }, checkOut: { $lte: newCheckOut } }
+    ]
+  })
+  .then(existingBookings => {
+    if (existingBookings.length > 0) {
+      return res.render("store/booking-failed", {
+        pageTitle: "Dates Unavailable",
+        currentPage: "bookings",
+        homeId: homeId
+      });
     }
-  });
 
-  booking.save()
-    .then(() => res.redirect("/bookings"))
-    .catch(err => console.log("BOOKING ERROR:", err));
+    // 2. FETCH HOME & CALCULATE BILL
+    return Home.findById(homeId)
+      .then(home => {
+        // 🟢 MATH TIME: Calculate nights
+        const differenceInTime = newCheckOut.getTime() - newCheckIn.getTime();
+        // Convert milliseconds to days (1000ms * 60s * 60m * 24h)
+        const nights = Math.ceil(differenceInTime / (1000 * 3600 * 24)); 
+        
+        // 🟢 Calculate Total Price
+        const totalPrice = nights * home.price;
+
+        const newBooking = new Booking({
+          homeId: homeId,
+          userId: req.user._id,
+          checkIn: newCheckIn,
+          checkOut: newCheckOut,
+          
+          // 🟢 FIX: Add the missing fields required by your Model
+          homeName: home.houseName, 
+          totalPrice: totalPrice,
+          price: home.price 
+        });
+        
+        return newBooking.save();
+      })
+      .then(() => {
+        res.redirect("/bookings");
+      });
+  })
+  .catch(err => console.log(err));
 };
-
+// ... keep your other exports like getHomeDetails, etc.
 exports.postCancelBooking = (req, res) => {
   Booking.findByIdAndDelete(req.body.bookingId)
     .then(() => res.redirect("/bookings"))

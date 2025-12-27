@@ -4,22 +4,24 @@
 
 <main class="container-fluid px-4 px-md-5" style="margin-top: 180px;">
   
-  <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-4 g-3 mb-5">
+  <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-5 g-x-3 g-y-4 mb-5">
     <% homes.forEach(home => { %>
         <div class="col">
             <div class="card h-100 border-0 bg-transparent group-card">
                 
-                <div class="position-relative rounded-4 overflow-hidden">
-                    <a href="/homes/<%= home._id %>" class="d-block">
+                <div class="position-relative rounded-4 overflow-hidden mb-2">
+                    
+                    <a href="/homes/<%= home._id %>" target="_blank" rel="noopener noreferrer" class="d-block">
                         <img src="<%= home.photoUrl[0] %>" 
                              class="w-100 object-fit-cover" 
                              alt="<%= home.houseName %>" 
-                             style="aspect-ratio: 1/0.95;"> </a>
+                             style="aspect-ratio: 20/19; display: block;"> 
+                    </a>
 
                     <div class="position-absolute top-0 end-0 p-3" style="z-index: 10;">
                         <form action="/favourite-list" method="POST">
                             <input type="hidden" name="homeId" value="<%= home._id %>">
-                            <button class="btn p-0 border-0 bg-transparent hover-scale">
+                            <button class="btn p-0 border-0 bg-transparent hover-scale shadow-none">
                                 <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" 
                                      aria-hidden="true" role="presentation" focusable="false" 
                                      style="display: block; fill: rgba(0, 0, 0, 0.5); height: 24px; width: 24px; stroke: white; stroke-width: 2; overflow: visible;">
@@ -28,27 +30,39 @@
                             </button>
                         </form>
                     </div>
+
+                    <% if (home.rating >= 4.8) { %>
+                    <div class="position-absolute top-0 start-0 m-2 px-2 py-1 bg-white rounded-pill shadow-sm border" style="font-size: 0.75rem; font-weight: 700; opacity: 0.95;">
+                        Guest favourite
+                    </div>
+                    <% } %>
+
                 </div>
                 
-                <a href="/homes/<%= home._id %>" class="text-decoration-none text-dark">
-                    <div class="mt-2">
+                <a href="/homes/<%= home._id %>" target="_blank" rel="noopener noreferrer" class="text-decoration-none text-dark">
+                    <div class="d-flex flex-column gap-0">
                         
                         <div class="d-flex justify-content-between align-items-start">
-                            <h6 class="fw-bold mb-0 text-truncate pe-2" style="font-size: 15px; line-height: 19px;"><%= home.location %></h6>
-                            
-                            <div class="d-flex align-items-center gap-1">
-                                <i class="bi bi-star-fill text-dark" style="font-size: 12px;"></i>
-                                <span style="font-size: 15px;"><%= home.rating %></span>
+                            <div class="fw-bold text-truncate" style="font-size: 15px; color: #222222; max-width: 80%;">
+                                <%= home.location %>
+                            </div>
+                            <div class="d-flex align-items-center gap-1" style="font-size: 15px;">
+                                <i class="bi bi-star-fill text-black" style="font-size: 12px;"></i>
+                                <span><%= home.rating %></span>
                             </div>
                         </div>
-                        
-                        <div class="mt-1" style="font-size: 15px; color: #717171; line-height: 19px;">
-                            <div class="text-truncate">Hosted by <%= home.houseName %></div>
-                            <div>Nov 15 - 20</div>
+
+                        <div class="text-truncate" style="font-size: 15px; color: #717171;">
+                            Hosted by <%= home.houseName %>
                         </div>
 
-                        <div class="mt-2" style="font-size: 15px; line-height: 19px;">
-                            <span class="fw-bold">₹<%= home.price %></span> night
+                        <div style="font-size: 15px; color: #717171;">
+                            Nov 15 - 20
+                        </div>
+
+                        <div class="mt-1 d-flex align-items-baseline gap-1" style="font-size: 15px; color: #222222;">
+                            <span class="fw-bold">₹<%= home.price %></span> 
+                            <span class="fw-normal">night</span>
                         </div>
 
                     </div>
@@ -62,11 +76,16 @@
 </main>
 
 <style>
-    .group-card { cursor: pointer; }
-    .hover-scale:hover { transform: scale(1.1); transition: transform 0.2s; }
-    .hover-scale:active { transform: scale(0.9); }
-    /* Font smoothing for that crisp look */
+    .hover-scale:hover { 
+        transform: scale(1.1); 
+        transition: transform 0.1s cubic-bezier(0.2, 0, 0.13, 2); 
+    }
+    .hover-scale:active {
+        transform: scale(0.95);
+    }
     body { -webkit-font-smoothing: antialiased; }
+    a:hover { text-decoration: none !important; }
+    button:focus { outline: none; box-shadow: none; }
 </style>
 
 </body>

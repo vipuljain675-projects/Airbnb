@@ -21,4 +21,7 @@ router.get("/favourite-list", storeController.getFavouriteList);
 router.post("/favourite-list", storeController.postAddToFavourite);
 router.post("/favourite-list/remove", storeController.postRemoveFavourite);
 
+// Add this line
+router.post("/reviews/add", storeController.postReview);
+
 module.exports = router;

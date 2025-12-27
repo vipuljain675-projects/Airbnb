@@ -2,6 +2,7 @@ const Home = require("../models/home");
 const User = require("../models/user");
 const Booking = require("../models/booking");
 const Favourite = require("../models/favourite");
+const Review = require("../models/review");
 
 /* =========================
    1. HOME LIST & DETAILS
@@ -20,19 +21,27 @@ exports.getHomeList = (req, res) => {
     .catch((err) => console.log(err));
 };
 
-exports.getHomeDetails = (req, res) => {
+exports.getHomeDetails = (req, res, next) => {
   const homeId = req.params.homeId;
 
   Home.findById(homeId)
-    .populate("userId") // Shows host info
+    .populate("userId") // Populates Host info
     .then((home) => {
       if (!home) return res.redirect("/");
 
-      res.render("store/home-detail", {
-        pageTitle: home.houseName,
-        currentPage: "home-list",
-        home: home,
-      });
+      // 🟢 NEW: Find reviews for this home
+      Review.find({ homeId: homeId })
+        .populate("userId") // Populates Reviewer info
+        .sort({ date: -1 }) // Newest first
+        .then(reviews => {
+            res.render("store/home-detail", {
+                home: home,
+                reviews: reviews, // Pass reviews to the view
+                pageTitle: home.houseName,
+                isAuthenticated: req.session.isLoggedIn,
+                user: req.session.user,
+            });
+        });
     })
     .catch((err) => console.log(err));
 };
@@ -197,8 +206,13 @@ exports.postBooking = (req, res, next) => {
 };
 
 exports.postCancelBooking = (req, res) => {
-  Booking.findByIdAndDelete(req.body.bookingId)
-    .then(() => res.redirect("/bookings"))
+  const bookingId = req.body.bookingId;
+  
+  // 🟢 CHANGE: Don't Delete. Just set status to 'Cancelled'
+  Booking.findByIdAndUpdate(bookingId, { status: 'Cancelled' })
+    .then(() => {
+      res.redirect("/bookings");
+    })
     .catch((err) => console.log(err));
 };
 
@@ -210,20 +224,25 @@ exports.getFavouriteList = (req, res, next) => {
   Favourite.find({ userId: req.user._id })
     .populate("homeId")
     .then((favourites) => {
-      // Filter out any nulls (if a home was deleted but fav remains)
+      
+      // Extract the home details
       const homes = favourites
         .map((f) => f.homeId)
         .filter((home) => home !== null);
         
       res.render("store/favourite-list", {
-        pageTitle: "My Favourites",
+        pageTitle: "My Wishlist",
         currentPage: "favourites",
-        favouriteHomes: homes,
+        
+        // 🟢 FIX: This must be 'homes' to match your EJS file
+        homes: homes, 
+        
+        isAuthenticated: true,
+        user: req.user
       });
     })
     .catch((err) => console.log(err));
 };
-
 exports.postAddToFavourite = (req, res, next) => {
   const homeId = req.body.homeId;
   
@@ -246,4 +265,20 @@ exports.postRemoveFavourite = (req, res, next) => {
       res.redirect("/favourite-list");
     })
     .catch((err) => console.log(err));
+};
+
+exports.postReview = (req, res, next) => {
+  const { homeId, rating, comment } = req.body;
+
+  const review = new Review({
+    homeId: homeId,
+    userId: req.session.user._id,
+    rating: rating,
+    comment: comment,
+    date: new Date()
+  });
+
+  review.save().then(() => {
+    res.redirect(`/homes/${homeId}`);
+  }).catch(err => console.log(err));
 };

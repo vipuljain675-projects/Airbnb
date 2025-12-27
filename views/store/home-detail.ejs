@@ -2,230 +2,284 @@
 <body class="bg-white">
 <%- include('../partials/nav') %>
 
-<main class="container mb-5" style="margin-top: 24px;">
+<main class="container mb-5" style="margin-top: 180px; max-width: 1120px;">
 
   <div class="mb-4">
-    <h1 class="listing-title"><%= home.houseName %></h1>
-    <div class="d-flex gap-2 text-muted small fw-bold">
-      <span>★ <%= home.rating %></span>
-      <span>•</span>
-      <span class="text-decoration-underline"><%= home.location %></span>
-    </div>
+      <h1 class="fw-bold mb-2" style="color: #222222;"><%= home.houseName %></h1>
+      <div class="d-flex justify-content-between align-items-center">
+          <div class="d-flex align-items-center gap-2 small">
+              <i class="bi bi-star-fill text-dark"></i>
+              <span class="fw-bold"><%= home.rating %></span>
+              <span class="text-secondary">·</span>
+              <span class="text-decoration-underline fw-bold">
+                  <%= typeof reviews !== 'undefined' ? reviews.length : 0 %> reviews
+              </span>
+              <span class="text-secondary">·</span>
+              <span class="text-secondary fw-bold text-decoration-underline"><%= home.location %></span>
+          </div>
+          <div class="d-flex gap-3">
+              <button class="btn btn-link text-dark text-decoration-none p-0 fw-bold small"><i class="bi bi-share me-2"></i>Share</button>
+              <form action="/favourite-list" method="POST" class="d-inline">
+                  <input type="hidden" name="homeId" value="<%= home._id %>">
+                  <button class="btn btn-link text-dark text-decoration-none p-0 fw-bold small"><i class="bi bi-heart me-2"></i>Save</button>
+              </form>
+          </div>
+      </div>
   </div>
 
-  <div class="photo-grid">
-    <img src="<%= home.photoUrl[0] %>" class="photo-main" alt="Main Photo">
-    
-    <div class="photo-col">
-      <img src="<%= home.photoUrl[1] || home.photoUrl[0] %>" class="photo-sub" alt="Photo 2">
-      <img src="<%= home.photoUrl[2] || home.photoUrl[0] %>" class="photo-sub" alt="Photo 3">
-    </div>
-  </div>
-
-  <div class="row mt-5">
-    
-    <div class="col-lg-8 pe-lg-5">
-      
-      <div class="d-flex align-items-center justify-content-between py-4 border-bottom">
-        <div>
-          <h4 class="fw-bold mb-1">Entire home hosted by <%= home.userId.firstName %></h4>
-          <p class="text-muted mb-0">4 guests • 2 bedrooms • 2 beds • 2 baths</p>
-        </div>
-        <div class="rounded-circle bg-dark text-white d-flex align-items-center justify-content-center shadow-sm" 
-             style="width: 56px; height: 56px; font-size: 1.5rem; font-weight: bold;">
-          <%= home.userId.firstName.charAt(0) %>
-        </div>
+  <div class="row g-2 mb-5 rounded-4 overflow-hidden" style="height: 400px;">
+      <div class="col-md-6 h-100">
+          <img src="<%= home.photoUrl[0] %>" class="w-100 h-100 object-fit-cover" alt="Main View" style="cursor: pointer;">
       </div>
-
-      <div class="py-4 border-bottom">
-        <div class="d-flex gap-3 mb-3">
-          <svg viewBox="0 0 32 32" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 10a2 2 0 0 1 2-2h22a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V10z"></path><path d="M13 2v6M19 2v6"></path></svg>
-          <div>
-            <div class="fw-bold">Designed by experts</div>
-            <div class="text-muted small">This home is unique and stylish.</div>
-          </div>
-        </div>
-        <div class="d-flex gap-3">
-          <svg viewBox="0 0 32 32" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 29L3 16 16 3l13 13-13 13z"></path></svg>
-          <div>
-            <div class="fw-bold">Self check-in</div>
-            <div class="text-muted small">Check yourself in with the keypad.</div>
-          </div>
-        </div>
-      </div>
-
-      <div class="py-4 border-bottom">
-        <p class="lh-lg" style="font-size: 1rem;"><%= home.description %></p>
-      </div>
-
-      <div class="py-4 border-bottom">
-        <h4 class="fw-bold mb-4">What this place offers</h4>
-        <div class="row">
-          <% if (home.amenities && home.amenities.length > 0) { %>
-            <% home.amenities.forEach(item => { %>
-              <div class="col-md-6 amenity-item mb-3">
-                <% if(item === 'Wifi') { %> <i class="bi bi-wifi"></i> <% } %>
-                <% if(item === 'AC') { %> <i class="bi bi-snow"></i> <% } %>
-                <% if(item === 'TV') { %> <i class="bi bi-tv"></i> <% } %>
-                <% if(item === 'Pool') { %> <i class="bi bi-water"></i> <% } %>
-                <% if(item === 'Parking') { %> <i class="bi bi-car-front"></i> <% } %>
-                <% if(item === 'Kitchen') { %> <i class="bi bi-cup-hot"></i> <% } %>
-                <% if(item === 'Washer') { %> <i class="bi bi-bucket"></i> <% } %>
-                <% if(item === 'Gym') { %> <i class="bi bi-activity"></i> <% } %>
-                <span class="ms-2"><%= item %></span>
+      <div class="col-md-6 h-100">
+          <div class="row g-2 h-100">
+              <div class="col-6 h-50"><img src="<%= home.photoUrl[1] || home.photoUrl[0] %>" class="w-100 h-100 object-fit-cover"></div>
+              <div class="col-6 h-50"><img src="<%= home.photoUrl[2] || home.photoUrl[0] %>" class="w-100 h-100 object-fit-cover"></div>
+              <div class="col-6 h-50"><img src="<%= home.photoUrl[3] || home.photoUrl[0] %>" class="w-100 h-100 object-fit-cover"></div>
+              <div class="col-6 h-50 position-relative">
+                  <img src="<%= home.photoUrl[4] || home.photoUrl[0] %>" class="w-100 h-100 object-fit-cover">
+                  <button class="btn btn-light position-absolute bottom-0 end-0 m-3 border shadow-sm btn-sm fw-bold px-3">
+                      <i class="bi bi-grid-3x3-gap me-2"></i>Show all photos
+                  </button>
               </div>
-            <% }) %>
-          <% } else { %>
-            <p class="text-muted">No specific amenities listed.</p>
-          <% } %>
-        </div>
-      </div>
-
-      <div class="py-4">
-        <h4 class="fw-bold mb-3">Where you'll be</h4>
-        <div id="map" class="rounded-4" style="height: 400px; border: 1px solid #e0e0e0;"></div>
-      </div>
-
-    </div>
-
-    <div class="col-lg-4">
-      <div class="card border rounded-4 shadow-sm p-4 sticky-top" style="top: 100px;">
-        
-        <div class="d-flex justify-content-between align-items-end mb-4">
-          <div>
-             <span class="fs-3 fw-bold">₹<%= home.price %></span> <span class="text-muted">night</span>
           </div>
-          <div class="small fw-bold">
-             <i class="bi bi-star-fill text-danger"></i> <%= home.rating %> <span class="text-muted text-decoration-underline">· 18 reviews</span>
-          </div>
-        </div>
-
-        <div class="alert alert-light border mb-3 text-center">
-            <small class="text-muted fw-bold text-uppercase" style="font-size: 0.7rem;">Availability</small>
-            <div class="d-flex justify-content-center align-items-center gap-2 mt-1">
-                 <div class="fw-bold text-dark">
-                    <%= home.availableFrom ? home.availableFrom.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : 'Ask Host' %>
-                 </div>
-                 <span class="text-muted fw-bold">&ndash;</span>
-                 <div class="fw-bold text-dark">
-                    <%= home.availableTo ? home.availableTo.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'Ask Host' %>
-                 </div>
-            </div>
-        </div>
-
-      <form action="/bookings" method="POST">     
-           <input type="hidden" name="homeId" value="<%= home._id %>">
-            
-            <div class="border rounded-4 mb-3">
-                <div class="d-flex border-bottom">
-                    <div class="w-50 p-2 border-end">
-                        <label class="small fw-bold text-uppercase" style="font-size: 0.7rem;">Check-in</label>
-                        <input type="date" name="checkIn" class="form-control border-0 p-0 shadow-none" 
-                               min="<%= home.availableFrom ? home.availableFrom.toISOString().split('T')[0] : '' %>"
-                               max="<%= home.availableTo ? home.availableTo.toISOString().split('T')[0] : '' %>" required>
-                    </div>
-                    <div class="w-50 p-2">
-                        <label class="small fw-bold text-uppercase" style="font-size: 0.7rem;">Check-out</label>
-                        <input type="date" name="checkOut" class="form-control border-0 p-0 shadow-none" 
-                               min="<%= home.availableFrom ? home.availableFrom.toISOString().split('T')[0] : '' %>"
-                               max="<%= home.availableTo ? home.availableTo.toISOString().split('T')[0] : '' %>" required>
-                    </div>
-                </div>
-
-                <div class="p-2 position-relative">
-                    <label class="small fw-bold text-uppercase ps-1" style="font-size: 0.7rem;">Guests</label>
-                    
-                    <div class="d-flex justify-content-between align-items-center p-1" 
-                         style="cursor: pointer;" id="guest-trigger">
-                        <span id="guest-label">1 Guest</span>
-                        <i class="bi bi-chevron-down"></i>
-                    </div>
-
-                    <input type="hidden" name="adults" id="input-adults" value="1">
-                    <input type="hidden" name="children" id="input-children" value="0">
-                    <input type="hidden" name="seniors" id="input-seniors" value="0">
-
-                    <div id="guest-dropdown" class="position-absolute bg-white shadow-lg rounded-4 p-3 border d-none" 
-                         style="top: 100%; left: 0; right: 0; z-index: 1000;">
-                        
-                        <div class="d-flex justify-content-between align-items-center mb-3">
-                            <div>
-                                <div class="fw-bold">Adults</div>
-                                <div class="small text-muted">Age 13+</div>
-                            </div>
-                            <div class="d-flex align-items-center gap-3">
-                                <button type="button" class="btn btn-outline-secondary rounded-circle p-0 d-flex align-items-center justify-content-center" 
-                                        style="width: 32px; height: 32px;" onclick="updateCount('adults', -1)">-</button>
-                                <span id="display-adults" class="fw-bold" style="width: 20px; text-align: center;">1</span>
-                                <button type="button" class="btn btn-outline-secondary rounded-circle p-0 d-flex align-items-center justify-content-center" 
-                                        style="width: 32px; height: 32px;" onclick="updateCount('adults', 1)">+</button>
-                            </div>
-                        </div>
-
-                        <div class="d-flex justify-content-between align-items-center mb-3">
-                            <div>
-                                <div class="fw-bold">Children</div>
-                                <div class="small text-muted">Ages 2–12</div>
-                            </div>
-                            <div class="d-flex align-items-center gap-3">
-                                <button type="button" class="btn btn-outline-secondary rounded-circle p-0 d-flex align-items-center justify-content-center" 
-                                        style="width: 32px; height: 32px;" onclick="updateCount('children', -1)">-</button>
-                                <span id="display-children" class="fw-bold" style="width: 20px; text-align: center;">0</span>
-                                <button type="button" class="btn btn-outline-secondary rounded-circle p-0 d-flex align-items-center justify-content-center" 
-                                        style="width: 32px; height: 32px;" onclick="updateCount('children', 1)">+</button>
-                            </div>
-                        </div>
-
-                        <div class="d-flex justify-content-between align-items-center mb-1">
-                            <div>
-                                <div class="fw-bold">Seniors</div>
-                                <div class="small text-muted">Age 60+</div>
-                            </div>
-                            <div class="d-flex align-items-center gap-3">
-                                <button type="button" class="btn btn-outline-secondary rounded-circle p-0 d-flex align-items-center justify-content-center" 
-                                        style="width: 32px; height: 32px;" onclick="updateCount('seniors', -1)">-</button>
-                                <span id="display-seniors" class="fw-bold" style="width: 20px; text-align: center;">0</span>
-                                <button type="button" class="btn btn-outline-secondary rounded-circle p-0 d-flex align-items-center justify-content-center" 
-                                        style="width: 32px; height: 32px;" onclick="updateCount('seniors', 1)">+</button>
-                            </div>
-                        </div>
-
-                        <div class="text-end mt-2">
-                             <button type="button" class="btn btn-link text-decoration-none fw-bold text-dark p-0" onclick="toggleGuestMenu()">Close</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <button class="btn btn-primary w-100 py-3 fw-bold rounded-3" 
-                    style="background: linear-gradient(to right, #E61E4D, #D80565); border: none;">
-                Reserve & Pay
-            </button>
-        </form>
-        
-        <div class="text-center mt-3 small text-muted">You won't be charged yet</div>
-
-        <div class="mt-4 pt-3 border-top">
-            <div class="d-flex justify-content-between fw-bold fs-5">
-                <span>Total</span>
-                <span>₹<%= home.price %> / night</span>
-            </div>
-            <div class="text-end small text-muted mt-1">(Final price calculated on boarding pass)</div>
-        </div>
-
-        <form action="/favourite-list" method="POST" class="mt-4 text-center">
-            <input type="hidden" name="homeId" value="<%= home._id %>">
-            <button class="btn btn-link text-muted text-decoration-underline fw-bold btn-sm">
-             <i class="bi bi-heart-fill me-1"></i> Save to Wishlist
-            </button>
-        </form>
-
       </div>
-    </div>
+  </div>
+
+  <div class="row g-5">
+      <div class="col-lg-7">
+          
+          <div class="d-flex justify-content-between align-items-center border-bottom pb-4 mb-4">
+              <div>
+                  <h3 class="fw-bold mb-1">Entire home hosted by <%= home.userId ? home.userId.firstName : 'Host' %></h3>
+                  <p class="text-secondary mb-0">4 guests · 2 bedrooms · 2 beds · 2 baths</p>
+              </div>
+              <div class="rounded-circle bg-dark text-white d-flex align-items-center justify-content-center fw-bold fs-4" style="width: 56px; height: 56px;">
+                 <%= home.userId ? home.userId.firstName.charAt(0) : 'H' %>
+              </div>
+          </div>
+
+          <div class="py-4 border-bottom">
+            <div class="d-flex gap-3 mb-3">
+              <svg viewBox="0 0 32 32" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 10a2 2 0 0 1 2-2h22a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V10z"></path><path d="M13 2v6M19 2v6"></path></svg>
+              <div>
+                <div class="fw-bold">Designed by experts</div>
+                <div class="text-muted small">This home is unique and stylish.</div>
+              </div>
+            </div>
+            <div class="d-flex gap-3">
+              <svg viewBox="0 0 32 32" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 29L3 16 16 3l13 13-13 13z"></path></svg>
+              <div>
+                <div class="fw-bold">Self check-in</div>
+                <div class="text-muted small">Check yourself in with the keypad.</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="py-4 border-bottom">
+              <p class="text-dark" style="line-height: 1.6;"><%= home.description %></p>
+          </div>
+          
+          <div class="py-4 border-bottom">
+            <h4 class="fw-bold mb-4">What this place offers</h4>
+            <div class="row">
+              <% if (home.amenities && home.amenities.length > 0) { %>
+                <% home.amenities.forEach(item => { %>
+                  <div class="col-md-6 amenity-item mb-3 d-flex align-items-center text-secondary">
+                    <i class="bi bi-check2-circle fs-5 me-3"></i> <span><%= item %></span>
+                  </div>
+                <% }) %>
+              <% } %>
+            </div>
+          </div>
+
+          <div class="py-5 border-bottom">
+              <div class="d-flex align-items-center gap-2 mb-4">
+                  <i class="bi bi-star-fill fs-4 text-dark"></i>
+                  <h3 class="fw-bold mb-0"><%= home.rating %> · <%= typeof reviews !== 'undefined' ? reviews.length : 0 %> reviews</h3>
+              </div>
+
+              <div class="row g-x-5 g-y-3 mb-5 d-none d-md-flex">
+                  <% 
+                     const categories = ['Cleanliness', 'Accuracy', 'Communication', 'Location', 'Check-in', 'Value']; 
+                  %>
+                  <% categories.forEach(cat => { 
+                       // 🟢 FIX: Calculate variables HERE to avoid VS Code Errors in HTML
+                       const widthPercent = Math.floor(Math.random() * (100 - 85) + 85);
+                       const score = "4." + (Math.floor(Math.random() * 5) + 5);
+                  %>
+                    <div class="col-6">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="text-dark"><%= cat %></span>
+                            <div class="d-flex align-items-center gap-2" style="width: 50%;">
+                                <div class="progress w-100 rounded-pill" style="height: 4px; background-color: #dddddd;">
+                                    <div class="progress-bar bg-dark rounded-pill" role="progressbar" style="<%= `width: ${widthPercent}%` %>"></div>
+                                </div>
+                                <span class="small fw-bold"><%= score %></span>
+                            </div>
+                        </div>
+                    </div>
+                  <% }) %>
+              </div>
+
+              <div class="row row-cols-1 row-cols-md-2 g-x-5 g-y-4">
+                  <% if (typeof reviews !== 'undefined' && reviews.length > 0) { %>
+                      <% reviews.forEach(review => { %>
+                          <div class="col">
+                              <div class="d-flex gap-3 mb-2">
+                                  <div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center fw-bold" style="width: 48px; height: 48px;">
+                                      <%= review.userId ? review.userId.firstName.charAt(0) : 'U' %>
+                                  </div>
+                                  <div>
+                                      <div class="fw-bold text-dark"><%= review.userId ? review.userId.firstName : 'User' %></div>
+                                      <div class="text-secondary small">
+                                          <%= review.date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' }) %>
+                                      </div>
+                                  </div>
+                              </div>
+                              <div class="mb-2 text-warning" style="font-size: 0.85rem;">
+                                  <% for(let i = 0; i < review.rating; i++) { %> <i class="bi bi-star-fill"></i> <% } %>
+                                  <% for(let i = review.rating; i < 5; i++) { %> <i class="bi bi-star text-secondary opacity-25"></i> <% } %>
+                              </div>
+                              <div class="text-dark" style="line-height: 1.5;"><%= review.comment %></div>
+                          </div>
+                      <% }) %>
+                  <% } else { %>
+                      <div class="col-12 text-muted">No reviews yet.</div>
+                  <% } %>
+              </div>
+
+              <div class="mt-4">
+                  <button type="button" class="btn btn-outline-dark rounded-3 fw-bold px-4 py-2" data-bs-toggle="modal" data-bs-target="#reviewModal">
+                      Write a Review
+                  </button>
+              </div>
+          </div>
+
+          <div class="py-4">
+            <h4 class="fw-bold mb-3">Where you'll be</h4>
+            <div id="map" class="rounded-4" style="height: 400px; border: 1px solid #e0e0e0; z-index: 1;"></div>
+          </div>
+      </div>
+
+      <div class="col-lg-5">
+          <div class="card shadow-lg border-0 rounded-4 p-4 sticky-top" style="top: 120px;">
+              <div class="d-flex justify-content-between align-items-baseline mb-3">
+                  <div><span class="fs-3 fw-bold">₹<%= home.price %></span> <span class="text-secondary">night</span></div>
+                  <div class="small fw-bold text-decoration-underline"><i class="bi bi-star-fill text-dark me-1"></i><%= home.rating %> · <%= typeof reviews !== 'undefined' ? reviews.length : 0 %> reviews</div>
+              </div>
+              
+              <div class="alert alert-light border mb-3 text-center">
+                <small class="text-muted fw-bold text-uppercase" style="font-size: 0.7rem;">Availability</small>
+                <div class="d-flex justify-content-center align-items-center gap-2 mt-1">
+                     <div class="fw-bold text-dark"><%= home.availableFrom ? home.availableFrom.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : 'Ask Host' %></div>
+                     <span class="text-muted fw-bold">&ndash;</span>
+                     <div class="fw-bold text-dark"><%= home.availableTo ? home.availableTo.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'Ask Host' %></div>
+                </div>
+              </div>
+
+              <form action="/bookings" method="POST">
+                  <input type="hidden" name="homeId" value="<%= home._id %>">
+                  <div class="border rounded-3 overflow-hidden mb-3">
+                      <div class="d-flex border-bottom">
+                          <div class="p-2 border-end w-50">
+                              <label class="d-block fw-bold" style="font-size: 0.7rem;">CHECK-IN</label>
+                              <input type="date" name="checkIn" class="form-control border-0 p-0 text-muted shadow-none" required>
+                          </div>
+                          <div class="p-2 w-50">
+                              <label class="d-block fw-bold" style="font-size: 0.7rem;">CHECK-OUT</label>
+                              <input type="date" name="checkOut" class="form-control border-0 p-0 text-muted shadow-none" required>
+                          </div>
+                      </div>
+                      <div class="p-2 position-relative">
+                        <label class="d-block fw-bold" style="font-size: 0.7rem;">GUESTS</label>
+                        <div class="d-flex justify-content-between align-items-center p-1" style="cursor: pointer;" id="guest-trigger">
+                            <span id="guest-label">1 Guest</span> <i class="bi bi-chevron-down"></i>
+                        </div>
+                        <input type="hidden" name="adults" id="input-adults" value="1">
+                        <input type="hidden" name="children" id="input-children" value="0">
+                        <input type="hidden" name="seniors" id="input-seniors" value="0">
+                        <div id="guest-dropdown" class="position-absolute bg-white shadow-lg rounded-4 p-3 border d-none" style="top: 100%; left: 0; right: 0; z-index: 1000;">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <div><div class="fw-bold">Adults</div><div class="small text-muted">Age 13+</div></div>
+                                <div class="d-flex align-items-center gap-3">
+                                    <button type="button" class="btn btn-outline-secondary rounded-circle p-0 d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;" onclick="updateCount('adults', -1)">-</button>
+                                    <span id="display-adults" class="fw-bold" style="width: 20px; text-align: center;">1</span>
+                                    <button type="button" class="btn btn-outline-secondary rounded-circle p-0 d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;" onclick="updateCount('adults', 1)">+</button>
+                                </div>
+                            </div>
+                            <div class="text-end mt-2"><button type="button" class="btn btn-link text-decoration-none fw-bold text-dark p-0" onclick="toggleGuestMenu()">Close</button></div>
+                        </div>
+                      </div>
+                  </div>
+                  <button class="btn btn-primary w-100 py-3 rounded-3 fw-bold fs-5 mb-3" style="background: #FF385C; border: none;">Reserve</button>
+              </form>
+              <div class="text-center small text-secondary mb-3">You won't be charged yet</div>
+              <div class="d-flex justify-content-between fw-bold fs-5"><span>Total</span><span>₹<%= home.price * 5 %></span></div>
+          </div>
+      </div>
+  </div>
 </main>
 
+<div class="modal fade" id="reviewModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content rounded-4 shadow-lg p-4">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 class="modal-title fw-bold">How was your stay?</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <form action="/reviews/add" method="POST">
+          <input type="hidden" name="homeId" value="<%= home._id %>">
+          
+          <div class="mb-4">
+              <label class="form-label fw-bold small text-secondary d-block">Rating</label>
+              <div class="d-flex gap-2" id="star-container">
+                  <input type="hidden" name="rating" id="rating-input" value="5">
+                  <i class="bi bi-star-fill fs-2 text-warning cursor-pointer star-icon" data-value="1"></i>
+                  <i class="bi bi-star-fill fs-2 text-warning cursor-pointer star-icon" data-value="2"></i>
+                  <i class="bi bi-star-fill fs-2 text-warning cursor-pointer star-icon" data-value="3"></i>
+                  <i class="bi bi-star-fill fs-2 text-warning cursor-pointer star-icon" data-value="4"></i>
+                  <i class="bi bi-star-fill fs-2 text-warning cursor-pointer star-icon" data-value="5"></i>
+              </div>
+          </div>
+
+          <div class="mb-4">
+              <label class="form-label fw-bold small text-secondary">Your Review</label>
+              <textarea name="comment" class="form-control rounded-3 p-3" rows="4" placeholder="Tell everyone about your experience..." required></textarea>
+          </div>
+          <button class="btn btn-primary w-100 py-3 rounded-3 fw-bold" style="background: #FF385C; border: none;">Submit Review</button>
+      </form>
+    </div>
+  </div>
+</div>
+
 <script>
-  // 🟢 MAP LOGIC (Keep existing map code)
+  // STAR RATING LOGIC
+  const starContainer = document.getElementById('star-container');
+  const starIcons = starContainer.querySelectorAll('.star-icon');
+  const ratingInput = document.getElementById('rating-input');
+
+  starIcons.forEach(star => {
+      star.addEventListener('click', function() {
+          const value = this.getAttribute('data-value');
+          ratingInput.value = value;
+          updateStars(value);
+      });
+  });
+
+  function updateStars(value) {
+      starIcons.forEach(s => {
+          if (s.getAttribute('data-value') <= value) {
+              s.classList.remove('text-secondary');
+              s.classList.add('text-warning');
+          } else {
+              s.classList.remove('text-warning');
+              s.classList.add('text-secondary');
+          }
+      });
+  }
+
+  // MAP LOGIC
   fetch('https://nominatim.openstreetmap.org/search?format=json&q=<%= home.location %>')
     .then(res => res.json())
     .then(data => {
@@ -233,59 +287,43 @@
       const lat = data[0].lat;
       const lon = data[0].lon;
       const map = L.map('map', { scrollWheelZoom: false }).setView([lat, lon], 13);
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; OpenStreetMap'
-      }).addTo(map);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '&copy; OpenStreetMap' }).addTo(map);
       L.circle([lat, lon], { color: '#ff385c', fillColor: '#ff385c', fillOpacity: 0.2, radius: 500 }).addTo(map);
     });
 
-  // 🟢 GUEST DROPDOWN LOGIC
+  // GUEST LOGIC
   const guestTrigger = document.getElementById('guest-trigger');
   const guestDropdown = document.getElementById('guest-dropdown');
   const guestLabel = document.getElementById('guest-label');
 
-  // Toggle Menu Visibility
-  function toggleGuestMenu() {
-    guestDropdown.classList.toggle('d-none');
-  }
-
-  // Close menu when clicking outside
-  document.addEventListener('click', function(e) {
-    if (!guestTrigger.contains(e.target) && !guestDropdown.contains(e.target)) {
-      guestDropdown.classList.add('d-none');
-    }
-  });
-
+  function toggleGuestMenu() { guestDropdown.classList.toggle('d-none'); }
+  document.addEventListener('click', function(e) { if (!guestTrigger.contains(e.target) && !guestDropdown.contains(e.target)) { guestDropdown.classList.add('d-none'); } });
   guestTrigger.addEventListener('click', toggleGuestMenu);
 
-  // Counters
-  const counts = {
-    adults: 1,
-    children: 0,
-    seniors: 0
-  };
-
+  const counts = { adults: 1, children: 0, seniors: 0 };
   function updateCount(type, change) {
     const newVal = counts[type] + change;
-
-    // Validation: Adults min 1, others min 0. Max 10.
-    if (type === 'adults' && newVal < 1) return;
-    if (newVal < 0) return;
-    if (newVal > 10) return;
-
-    // Update State
+    if (type === 'adults' && newVal < 1) return; if (newVal < 0) return; if (newVal > 10) return;
     counts[type] = newVal;
-
-    // Update UI Number
     document.getElementById(`display-${type}`).innerText = newVal;
-
-    // Update Hidden Input (For Server)
     document.getElementById(`input-${type}`).value = newVal;
-
-    // Update Main Label (e.g., "3 Guests")
     const totalGuests = counts.adults + counts.children + counts.seniors;
     guestLabel.innerText = `${totalGuests} Guest${totalGuests !== 1 ? 's' : ''}`;
   }
 </script>
+
+<style>
+    input:focus,
+    select:focus,
+    button:focus {
+        outline: none !important;
+        box-shadow: none !important;
+    }
+
+    .cursor-pointer {
+        cursor: pointer;
+    }
+</style>
+
 </body>
 </html>

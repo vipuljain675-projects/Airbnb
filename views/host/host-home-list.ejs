@@ -1,33 +1,51 @@
 <%- include('../partials/head') %>
-<body>
+<body class="bg-white">
 <%- include('../partials/nav') %>
 
-<main class="container mt-4">
-  <div class="d-flex justify-content-between mb-4">
-    <h2>Your Listings</h2>
-    <a href="/host/add-home" class="btn btn-primary">Add New Home</a>
+<main class="container mb-5" style="margin-top: 180px;">
+  
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="fw-bold h2">Your Listings</h1>
+    <a href="/host/add-home" class="btn btn-dark rounded-pill px-4 fw-bold">
+        <i class="bi bi-plus-lg me-2"></i>Create new listing
+    </a>
   </div>
 
-  <div class="row">
-    <% homes.forEach(home => { %>
-      <div class="col-md-4 mb-4">
-        <div class="card">
-          <img src="<%= home.photoUrl[0] %>" class="card-img-top">
-          <div class="card-body">
-            <h5><%= home.houseName %></h5>
-            <p><%= home.location %></p>
+  <% if (homes.length > 0) { %>
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+      <% homes.forEach(home => { %>
+        <div class="col">
+          <div class="card h-100 border-0">
+            
+            <div class="position-relative rounded-4 overflow-hidden mb-3">
+               <img src="<%= home.photoUrl[0] %>" class="w-100 object-fit-cover" alt="<%= home.houseName %>" style="aspect-ratio: 4/3;">
+            </div>
 
-            <a href="/host/edit-home/<%= home._id %>?editing=true"
-               class="btn btn-sm btn-outline-secondary">Edit</a>
+            <div class="d-flex justify-content-between align-items-start">
+               <div>
+                  <h5 class="fw-bold mb-0 text-truncate" style="max-width: 250px;"><%= home.houseName %></h5>
+                  <div class="text-secondary small"><%= home.location %></div>
+               </div>
+            </div>
 
-            <form action="/host/delete-home/<%= home._id %>" method="POST" class="d-inline">
-              <button class="btn btn-sm btn-outline-danger">Delete</button>
-            </form>
+            <div class="mt-3 d-flex gap-2">
+                <a href="/host/edit-home/<%= home._id %>" class="btn btn-outline-secondary btn-sm rounded-pill px-3 fw-bold">Edit</a>
+                <form action="/host/delete-home/<%= home._id %>" method="POST">
+                    <button class="btn btn-outline-danger btn-sm rounded-pill px-3 fw-bold">Delete</button>
+                </form>
+            </div>
+
           </div>
         </div>
-      </div>
-    <% }) %>
-  </div>
+      <% }) %>
+    </div>
+  <% } else { %>
+    <div class="text-center py-5">
+      <h3 class="text-muted">You don't have any listings yet.</h3>
+      <a href="/host/add-home" class="btn btn-dark mt-3 rounded-pill px-4">Get Started</a>
+    </div>
+  <% } %>
+
 </main>
 </body>
 </html>
